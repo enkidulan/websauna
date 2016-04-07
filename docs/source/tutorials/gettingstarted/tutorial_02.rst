@@ -71,6 +71,27 @@ Install PostgreSQL
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
     sudo apt-get install postgresql-9.4 libpq-dev
+    
+Installing system dependencies on Fedora
+----------------------------------------
+
+System basic dependencies:
+
+.. code-block:: shell
+
+    dnf update -y
+    dnf install git python3 python3-devel python3-virtualenv
+
+Postgresql (for detailed setup checkout this manual https://fedoraproject.org/wiki/PostgreSQL):
+
+.. code-block:: shell
+
+    dnf install postgresql-server postgresql-contrib
+    postgresql-setup --initdb --unit postgresql
+    systemctl enable postgresql
+    systemctl start postgresql
+    
+    
 
 Installing Websauna Python package
 ==================================
