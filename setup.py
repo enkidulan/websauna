@@ -114,11 +114,6 @@ setup(
         # Python 3.4 typing
         "backports.typing",
 
-        # Needed by python_notebook etc. who call pyramid.paster module
-        "ipython[notebook]<4",
-        "pyramid_notebook>=0.1.6",
-        "PasteDeploy",
-
         # Console logging
         "rainbow_logging_handler",
 
@@ -132,6 +127,13 @@ setup(
     # for example:
     # $ pip install -e ".[dev,test, utils]"
     extras_require={
+
+        'notebook': [
+            'ipython[notebook]<4',
+            'pyramid_notebook>=0.1.6',
+            'PasteDeploy',
+            'pgcli',  # to not break the tutorial instructions
+        ]
 
         # Dependencies needed to build and release Websauna
         'dev': ['check-manifest', 'Sphinx', 'setuptools_git', 'zest.releaser', 'sphinx-autodoc-typehints', 'pyramid_autodoc', "sphinx_rtd_theme", "sphinxcontrib-zopeext", "ruamel.yaml"],

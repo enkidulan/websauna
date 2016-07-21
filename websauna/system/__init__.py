@@ -562,6 +562,14 @@ class Initializer:
     @event_source
     def configure_notebook(self):
         """Setup pyramid_notebook integration."""
+
+        # XXX: looks shity
+        try:
+            import pyramid_notebook
+        except ImportError:
+            logging.info('Can not find pyramid_notebook in python environment, starting without it')
+            return
+
         import websauna.system.notebook.views
         self.config.add_route('admin_shell', '/notebook/admin-shell')
         self.config.add_route('shutdown_notebook', '/notebook/shutdown')
