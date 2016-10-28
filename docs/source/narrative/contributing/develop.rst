@@ -21,7 +21,7 @@ First test run
 
 To run tests you need to install development and tests dependencies:
 
-    pip install websauna[dev,test]
+    pip install websauna[dev,test,celery]
     # or in case of local development of websauna
     pip install .[dev,test,celery]
 
