@@ -19,6 +19,14 @@ Unit tests are `PyTest based <http://pytest.org/>`_. They use `Selenium browser 
 First test run
 ++++++++++++++
 
+To run tests you need to install development and tests dependencies:
+
+    pip install websauna[dev,test]
+    # or in case of local development of websauna
+    pip install .[dev,test,celery]
+
+The other thing is that you need to have `phantomjs` in your system as well, to install it follow instructions from http://phantomjs.org/download.html.
+
 Prepare wheel archive which will speed up scaffold tests tremendously::
 
      bash websauna/tests/create_wheelhouse.bash
