@@ -191,6 +191,10 @@ setup(
         'pyramid.scaffold': [
             "websauna_app=websauna.scaffolds:App",
             "websauna_addon=websauna.scaffolds:Addon",
-        ]
+        ],
+
+        'pytest11': [
+            'websauna = websauna.tests.fixtures',
+        ],
     },
 )
