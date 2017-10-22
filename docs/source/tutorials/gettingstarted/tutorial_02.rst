@@ -55,6 +55,20 @@ Then you can see them:
     postgresql   started moo  /Users/mikko/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
     redis        started moo  /Users/mikko/Library/LaunchAgents/homebrew.mxcl.redis.plist
 
+Alternatively, for development purposes
+`cookiecutter-websauna-app <https://github.com/websauna/cookiecutter-websauna-app>`_
+template provides a `docker-compose.yml` file that will setup and fire-up containers
+with ready to use `postgresql` and `redis` (this method requires having
+`docker` version 17+ and `docker-compose`):
+
+.. code-block:: console
+
+    $ cd project-root-folder
+    $ docker-compose start
+    Starting redis    ... done
+    Starting postgres ... done
+
+
 Make sure ``python3`` command points to Python 3.5:
 
 .. code-block:: console

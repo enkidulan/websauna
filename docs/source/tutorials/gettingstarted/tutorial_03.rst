@@ -11,7 +11,7 @@ Creating application package
 Enter to your project folder and make sure the :term:`virtual environment` is active on your shell:
 
     .. code-block:: shell
-        
+
         cd myproject
         source venv/bin/activate
 
@@ -26,7 +26,7 @@ Websauna uses :term:`cookiecutter` tool to bootstrap a new project. To install i
 Now, it is possible to create a new application:
 
     .. code-block:: shell
-    
+
         cookiecutter gh:websauna/cookiecutter-websauna-app
 
 
@@ -82,6 +82,7 @@ This will create a project structure similar to::
     company.application/company/application/templates           # Jinja2 page templates
     company.application/company/application/tests               # Automatic test suite
     company.application/setup.py                                # Python package data
+    company.application/docker-compose.yml                      # Docker compose file for running backing services
 
 
 Installing application package
