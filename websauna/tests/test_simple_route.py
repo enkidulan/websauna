@@ -69,3 +69,15 @@ def test_method_of_a_class(testapp):
 def test_class_method_by_attr(testapp):
     res = testapp.get('/class-attr')
     assert res.body == b'class-attr'
+
+
+def test_registered_routes_docs(config):
+    config.get_routes_mapper()
+    request = testing.DummyRequest()
+    assert request.route_url('view_callable')           == 'http://example.com/path/to/view'
+    assert request.route_url('foobar', arg='123')       == 'http://example.com/path/to/view/123'
+    assert request.route_url('edit')                    == 'http://example.com/edit'
+    assert request.route_url('change')                  == 'http://example.com/change'
+    assert request.route_url('ClassAsAView')            == 'http://example.com/class-as-a-view'
+    assert request.route_url('MyViewClass.amethod')     == 'http://example.com/amethod'
+    assert request.route_url('MyViewClassAttr.amethod') == 'http://example.com/class-attr'
