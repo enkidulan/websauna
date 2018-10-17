@@ -15,14 +15,14 @@ from websauna.system.http.utils import make_routable_request
 
 @pytest.fixture(scope="module")
 def sitemap_app(request, paster_config):
-    '''Custom WSGI app with travesal points for sitemap enabled.'''
+    """Custom WSGI app with travesal points for sitemap enabled."""
 
     class Initializer(websauna.system.DemoInitializer):
-
         def configure_views(self):
             super(Initializer, self).configure_views()
             from websauna.tests import sitemapsamples
-            self.config.add_route('sitemap_test', '/container/*traverse', factory=sitemapsamples.container_factory)
+
+            self.config.add_route("sitemap_test", "/container/*traverse", factory=sitemapsamples.container_factory)
             self.config.scan(sitemapsamples)
 
     global_config, app_settings = paster_config
@@ -50,7 +50,7 @@ def test_route_items():
     with pyramid.testing.testConfig() as config:
 
         request = DummyRequest()
-        config.add_route('bar', '/bar/{id}')
+        config.add_route("bar", "/bar/{id}")
 
         s = sitemap.Sitemap()
         s.add_item(sitemap.RouteItem("bar", id=1, lastmod="2015-01-01"))
@@ -74,7 +74,6 @@ def test_generator_items():
     """Generated items appear in the sitemap."""
 
     class FooItem(sitemap.SitemapItem):
-
         def __init__(self, name):
             super(FooItem, self).__init__()
             self.name = name
@@ -116,7 +115,7 @@ def test_reflect_traverse(builder):
     urls = [i.location(request) for i in builder.sitemap.items if isinstance(i, TraverseItem)]
 
     # Admin traversing is protected by view permission
-    assert not(any("admin" in u for u in urls))
+    assert not (any("admin" in u for u in urls))
 
     # We get default view (empty name) and named view
     assert any(u.endswith("/container/") for u in urls)

@@ -71,7 +71,20 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         TODO: Resolve the issue with the colanderalchemy author politically correct way. What we are doing now is just a temporary 0.1 solution.
     """
 
-    def __init__(self, class_, dbsession, includes=None, excludes=None, overrides=None, unknown='ignore', nested=False, type_overrides=None, relationship_overrides=None, automatic_relationships=False, **kw):
+    def __init__(
+        self,
+        class_,
+        dbsession,
+        includes=None,
+        excludes=None,
+        overrides=None,
+        unknown="ignore",
+        nested=False,
+        type_overrides=None,
+        relationship_overrides=None,
+        automatic_relationships=False,
+        **kw,
+    ):
         """
         :param includes:
         :param overrides:
@@ -81,14 +94,16 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         :param kw:
         :return:
         """
-        assert type_overrides, "Always provide type_overrides, otherwise this crap doesn't work when these nodes get nested"
+        assert (
+            type_overrides
+        ), "Always provide type_overrides, otherwise this crap doesn't work when these nodes get nested"
 
         self.inspector = inspect(class_)
         kwargs = kw.copy()
 
         # Obtain configuration specific from the mapped class
         kwargs.update(getattr(self.inspector.class_, self.ca_class_key, {}))
-        unknown = kwargs.pop('unknown', unknown)
+        unknown = kwargs.pop("unknown", unknown)
 
         # The default type of this SchemaNode is Mapping.
         super(SQLAlchemySchemaNode, self).__init__(Mapping(unknown), **kwargs)
@@ -109,7 +124,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
     def add_nodes(self, includes, excludes, overrides, nested):
 
         if set(excludes) & set(includes):
-            msg = 'excludes and includes are mutually exclusive.'
+            msg = "excludes and includes are mutually exclusive."
             raise ValueError(msg)
 
         properties = sorted(self.inspector.attrs, key=_creation_order)
@@ -119,34 +134,24 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             prop = self.inspector.attrs.get(name, name)
 
             if name in excludes or (includes and name not in includes):
-                log.debug('Attribute %s skipped imperatively', name)
+                log.debug("Attribute %s skipped imperatively", name)
                 continue
 
             name_overrides_copy = overrides.get(name, {}).copy()
 
-            if (isinstance(prop, ColumnProperty) and isinstance(prop.columns[0], Column)):
-                node = self.get_schema_from_column(
-                    prop,
-                    name_overrides_copy
-                )
+            if isinstance(prop, ColumnProperty) and isinstance(prop.columns[0], Column):
+                node = self.get_schema_from_column(prop, name_overrides_copy)
             elif isinstance(prop, RelationshipProperty):
 
                 if not nested:
-                    log.debug('Attribute %s skipped because not recursing to nested', name)
+                    log.debug("Attribute %s skipped because not recursing to nested", name)
                     continue
 
-                node = self.get_schema_from_relationship(
-                    prop,
-                    name_overrides_copy
-                )
+                node = self.get_schema_from_relationship(prop, name_overrides_copy)
             elif isinstance(prop, colander.SchemaNode):
                 node = prop
             else:
-                log.debug(
-                    'Attribute %s skipped due to not being '
-                    'a ColumnProperty or RelationshipProperty',
-                    name
-                )
+                log.debug("Attribute %s skipped due to not being " "a ColumnProperty or RelationshipProperty", name)
                 continue
 
             if node is not None:
@@ -177,14 +182,13 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
                         value = getattr(obj, name)
 
                     elif prop.uselist:
-                        value = [self[name].children[0].dictify(o)
-                                 for o in getattr(obj, name)]
+                        value = [self[name].children[0].dictify(o) for o in getattr(obj, name)]
                     else:
                         o = getattr(obj, name)
                         value = None if o is None else self[name].dictify(o)
                 except AttributeError:
                     # The given node isn't part of the SQLAlchemy model
-                    msg = 'SQLAlchemySchemaNode.dictify: %s not found on %s'
+                    msg = "SQLAlchemySchemaNode.dictify: %s not found on %s"
                     logger.debug(msg, name, self)
                     continue
 
@@ -233,7 +237,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             if mapper.has_property(attr):
                 prop = mapper.get_property(attr)
 
-                if hasattr(prop, 'mapper'):
+                if hasattr(prop, "mapper"):
                     value = dict_[attr]
 
                     if prop.uselist:
@@ -244,8 +248,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
                             pass
                         else:
                             # Try to map incoming colander items back to SQL items
-                            value = [self[attr].children[0].objectify(obj)
-                                     for obj in dict_[attr]]
+                            value = [self[attr].children[0].objectify(obj) for obj in dict_[attr]]
                     else:
 
                         if hasattr(value, "__tablename__"):
@@ -271,9 +274,9 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             else:
                 # Ignore attributes if they are not mapped
                 logger.debug(
-                    'SQLAlchemySchemaNode.objectify: %s not found on '
-                    '%s. This property has been ignored.',
-                    attr, self
+                    "SQLAlchemySchemaNode.objectify: %s not found on " "%s. This property has been ignored.",
+                    attr,
+                    self,
                 )
                 continue
 
@@ -288,32 +291,29 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         kwargs = dict(name=name)
         column = prop.columns[0]
 
-        typedecorator_overrides = getattr(column.type,
-                                          self.ca_class_key, {}).copy()
+        typedecorator_overrides = getattr(column.type, self.ca_class_key, {}).copy()
         # print("colanderalchemy ", prop, typedecorator_overrides)
 
         declarative_overrides = column.info.get(self.sqla_info_key, {}).copy()
         self.declarative_overrides[name] = declarative_overrides.copy()
 
-        key = 'exclude'
+        key = "exclude"
 
-        if key not in itertools.chain(declarative_overrides, overrides) \
-           and typedecorator_overrides.pop(key, False):
-            log.debug('Column %s skipped due to TypeDecorator overrides', name)
+        if key not in itertools.chain(declarative_overrides, overrides) and typedecorator_overrides.pop(key, False):
+            log.debug("Column %s skipped due to TypeDecorator overrides", name)
             return None
 
         if key not in overrides and declarative_overrides.pop(key, False):
-            log.debug('Column %s skipped due to declarative overrides', name)
+            log.debug("Column %s skipped due to declarative overrides", name)
             return None
 
         if overrides.pop(key, False):
-            log.debug('Column %s skipped due to imperative overrides', name)
+            log.debug("Column %s skipped due to imperative overrides", name)
             return None
 
-        self.check_overrides(name, 'name', typedecorator_overrides,
-                             declarative_overrides, overrides)
+        self.check_overrides(name, "name", typedecorator_overrides, declarative_overrides, overrides)
 
-        for key in ['missing', 'default']:
+        for key in ["missing", "default"]:
             self.check_overrides(name, key, typedecorator_overrides, {}, {})
 
         # The SchemaNode built using the ColumnProperty has no children.
@@ -328,9 +328,9 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         dialect = self.dbsession.bind.engine.dialect
         column_type = column.type.dialect_impl(dialect)
 
-        imperative_type = overrides.pop('typ', None)
-        declarative_type = declarative_overrides.pop('typ', None)
-        typedecorator_type = typedecorator_overrides.pop('typ', None)
+        imperative_type = overrides.pop("typ", None)
+        declarative_type = declarative_overrides.pop("typ", None)
+        typedecorator_type = typedecorator_overrides.pop("typ", None)
 
         if self.type_overrides is not None:
 
@@ -338,7 +338,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
 
             if type_overrides_type == TypeOverridesHandling.drop:
                 # This column should not appear on the form
-                log.debug('Column %s: dropped by type overrides callback', name)
+                log.debug("Column %s: dropped by type overrides callback", name)
                 return None
 
             elif type_overrides_type == TypeOverridesHandling.unknown:
@@ -351,35 +351,32 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             type_overrides_kwargs = {}
 
         if imperative_type is not None:
-            if hasattr(imperative_type, '__call__'):
+            if hasattr(imperative_type, "__call__"):
                 type_ = imperative_type()
             else:
                 type_ = imperative_type
-            log.debug('Column %s: type overridden imperatively: %s.', name, type_)
+            log.debug("Column %s: type overridden imperatively: %s.", name, type_)
 
         elif declarative_type is not None:
-            if hasattr(declarative_type, '__call__'):
+            if hasattr(declarative_type, "__call__"):
                 type_ = declarative_type()
             else:
                 type_ = declarative_type
-            log.debug('Column %s: type overridden via declarative: %s.',
-                      name, type_)
+            log.debug("Column %s: type overridden via declarative: %s.", name, type_)
 
         elif typedecorator_type is not None:
-            if hasattr(typedecorator_type, '__call__'):
+            if hasattr(typedecorator_type, "__call__"):
                 type_ = typedecorator_type()
             else:
                 type_ = typedecorator_type
-            log.debug('Column %s: type overridden via TypeDecorator: %s.',
-                      name, type_)
+            log.debug("Column %s: type overridden via TypeDecorator: %s.", name, type_)
 
         elif type_overrides_type is not None:
-            if hasattr(type_overrides_type, '__call__'):
+            if hasattr(type_overrides_type, "__call__"):
                 type_ = type_overrides_type()
             else:
                 type_ = type_overrides_type
-            log.debug('Column %s: type overridden via type_overrides: %s.',
-                      name, type_)
+            log.debug("Column %s: type overridden via type_overrides: %s.", name, type_)
 
         elif isinstance(column_type, Boolean):
             type_ = colander.Boolean()
@@ -411,10 +408,9 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             type_ = colander.Time()
         else:
             raise NotImplementedError(
-                'Not able to derive a colander type from sqlalchemy '
-                'type: %s  Please explicitly provide a colander '
-                '`typ` for the "%s" Column.'
-                % (repr(column_type), name)
+                "Not able to derive a colander type from sqlalchemy "
+                "type: %s  Please explicitly provide a colander "
+                '`typ` for the "%s" Column.' % (repr(column_type), name)
             )
 
         """
@@ -432,7 +428,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         all values for server_default should be ignored for
         Colander default
         """
-        if (isinstance(column.default, ColumnDefault) and column.default.is_scalar):
+        if isinstance(column.default, ColumnDefault) and column.default.is_scalar:
             kwargs["default"] = column.default.arg
 
         """
@@ -469,7 +465,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
             kwargs["missing"] = colander.null
         elif isinstance(column.server_default, FetchedValue):
             kwargs["missing"] = drop  # value generated by SQLA backend
-        elif (hasattr(column.table, "_autoincrement_column") and id(column.table._autoincrement_column) == id(column)):
+        elif hasattr(column.table, "_autoincrement_column") and id(column.table._autoincrement_column) == id(column):
             # this column is the autoincrement column, so we can drop
             # it if it's missing and let the database generate it
             kwargs["missing"] = drop
@@ -492,42 +488,40 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
 
         class_ = prop.mapper
 
-        if declarative_overrides.pop('exclude', False):
-            log.debug('Relationship %s skipped due to declarative overrides',
-                      name)
+        if declarative_overrides.pop("exclude", False):
+            log.debug("Relationship %s skipped due to declarative overrides", name)
             return None
 
-        for key in ['name', 'typ']:
-            self.check_overrides(name, key, {}, declarative_overrides,
-                                 overrides)
+        for key in ["name", "typ"]:
+            self.check_overrides(name, key, {}, declarative_overrides, overrides)
 
-        key = 'children'
+        key = "children"
         imperative_children = overrides.pop(key, None)
         declarative_children = declarative_overrides.pop(key, None)
         if imperative_children is not None:
             children = imperative_children
-            msg = 'Relationship %s: %s overridden imperatively.'
+            msg = "Relationship %s: %s overridden imperatively."
             log.debug(msg, name, key)
 
         elif declarative_children is not None:
             children = declarative_children
-            msg = 'Relationship %s: %s overridden via declarative.'
+            msg = "Relationship %s: %s overridden via declarative."
             log.debug(msg, name, key)
 
         else:
             children = None
 
-        key = 'includes'
+        key = "includes"
         imperative_includes = overrides.pop(key, None)
         declarative_includes = declarative_overrides.pop(key, None)
         if imperative_includes is not None:
             includes = imperative_includes
-            msg = 'Relationship %s: %s overridden imperatively.'
+            msg = "Relationship %s: %s overridden imperatively."
             log.debug(msg, name, key)
 
         elif declarative_includes is not None:
             includes = declarative_includes
-            msg = 'Relationship %s: %s overridden via declarative.'
+            msg = "Relationship %s: %s overridden via declarative."
             log.debug(msg, name, key)
 
         else:
@@ -550,18 +544,18 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
                 assert isinstance(result, colander.SchemaNode)
                 return result
 
-        key = 'excludes'
+        key = "excludes"
         imperative_excludes = overrides.pop(key, None)
         declarative_excludes = declarative_overrides.pop(key, None)
 
         if imperative_excludes is not None:
             excludes = imperative_excludes
-            msg = 'Relationship %s: %s overridden imperatively.'
+            msg = "Relationship %s: %s overridden imperatively."
             log.debug(msg, name, key)
 
         elif declarative_excludes is not None:
             excludes = declarative_excludes
-            msg = 'Relationship %s: %s overridden via declarative.'
+            msg = "Relationship %s: %s overridden via declarative."
             log.debug(msg, name, key)
 
         else:
@@ -571,18 +565,18 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         if includes is None and excludes is None:
             includes = [p.key for p in inspect(class_).column_attrs]
 
-        key = 'overrides'
+        key = "overrides"
         imperative_rel_overrides = overrides.pop(key, None)
         declarative_rel_overrides = declarative_overrides.pop(key, None)
 
         if imperative_rel_overrides is not None:
             rel_overrides = imperative_rel_overrides
-            msg = 'Relationship %s: %s overridden imperatively.'
+            msg = "Relationship %s: %s overridden imperatively."
             log.debug(msg, name, key)
 
         elif declarative_rel_overrides is not None:
             rel_overrides = declarative_rel_overrides
-            msg = 'Relationship %s: %s overridden via declarative.'
+            msg = "Relationship %s: %s overridden via declarative."
             log.debug(msg, name, key)
 
         else:
@@ -595,7 +589,7 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         else:
             # Any other join is thus optional
             missing = []
-        kwargs['missing'] = missing
+        kwargs["missing"] = missing
 
         kwargs.update(declarative_overrides)
         kwargs.update(overrides)
@@ -608,14 +602,16 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
                 # xToOne relationships.
                 return SchemaNode(Mapping(), *children, **kwargs)
 
-        node = PropertyAwareSQLAlchemySchemaNode(class_,
-                                    name=name,
-                                    includes=includes,
-                                    excludes=excludes,
-                                    overrides=rel_overrides,
-                                    missing=missing,
-                                    type_overrides=self.type_overrides,
-                                    relationship_overrides=self.relationship_overrides)
+        node = PropertyAwareSQLAlchemySchemaNode(
+            class_,
+            name=name,
+            includes=includes,
+            excludes=excludes,
+            overrides=rel_overrides,
+            missing=missing,
+            type_overrides=self.type_overrides,
+            relationship_overrides=self.relationship_overrides,
+        )
 
         if prop.uselist:
             node = SchemaNode(Sequence(), node, **kwargs)
@@ -625,17 +621,19 @@ class PropertyAwareSQLAlchemySchemaNode(SQLAlchemySchemaNode):
         return node
 
     def clone(self):
-        cloned = self.__class__(self.class_,
-                                self.dbsession,
-                                self.includes,
-                                self.excludes,
-                                self.overrides,
-                                self.unknown,
-                                self.nested,
-                                self.type_overrides,
-                                self.relationship_overrides,
-                                self.automatic_relationships,
-                                **self.kwargs)
+        cloned = self.__class__(
+            self.class_,
+            self.dbsession,
+            self.includes,
+            self.excludes,
+            self.overrides,
+            self.unknown,
+            self.nested,
+            self.type_overrides,
+            self.relationship_overrides,
+            self.automatic_relationships,
+            **self.kwargs,
+        )
         cloned.__dict__.update(self.__dict__)
         cloned.children = [node.clone() for node in self.children]
         return cloned

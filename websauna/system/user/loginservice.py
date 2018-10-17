@@ -64,7 +64,7 @@ class DefaultLoginService:
         """
         request = self.request
         settings = request.registry.settings
-        allow_email_auth = settings.get('websauna.allow_email_auth', True)
+        allow_email_auth = settings.get("websauna.allow_email_auth", True)
 
         # Check login with username
         user_registry = get_user_registry(request)
@@ -75,7 +75,7 @@ class DefaultLoginService:
             user = user_registry.get_authenticated_user_by_email(username, password)
 
         if not user:
-            raise AuthenticationFailure('Invalid username or password.')
+            raise AuthenticationFailure("Invalid username or password.")
 
         return user
 
@@ -86,7 +86,7 @@ class DefaultLoginService:
         """
         messages.add(self.request, kind="success", msg="You are now logged in.", msg_id="msg-you-are-logged-in")
 
-    def do_post_login_actions(self, user: IUser, headers: dict, location: str=None) -> Response:
+    def do_post_login_actions(self, user: IUser, headers: dict, location: str = None) -> Response:
         """What happens after a successful login.
 
         Override this to customize e.g. where the user lands.
@@ -99,7 +99,7 @@ class DefaultLoginService:
         request = self.request
 
         if not location:
-            location = get_config_route(request, 'websauna.login_redirect')
+            location = get_config_route(request, "websauna.login_redirect")
 
         self.greet_user(user)
 
@@ -110,7 +110,7 @@ class DefaultLoginService:
 
         return HTTPFound(location=location, headers=headers)
 
-    def authenticate_user(self, user: IUser, login_source: str, location: str=None) -> Response:
+    def authenticate_user(self, user: IUser, login_source: str, location: str = None) -> Response:
         """Make the current session logged in session for this particular user.
 
         How to authenticate user using the login service (assuming you have done password match or related yourself):
@@ -136,14 +136,16 @@ class DefaultLoginService:
         request = self.request
         settings = request.registry.settings
 
-        require_activation = asbool(settings.get('websauna.require_activation', True))
-        allow_inactive_login = asbool(settings.get('websauna.allow_inactive_login', False))
+        require_activation = asbool(settings.get("websauna.require_activation", True))
+        allow_inactive_login = asbool(settings.get("websauna.allow_inactive_login", False))
 
         if (not allow_inactive_login) and require_activation and (not user.is_activated()):
-            raise AuthenticationFailure('Your account is not active, please check your e-mail. If your account activation email as expired please request a password reset.')
+            raise AuthenticationFailure(
+                "Your account is not active, please check your e-mail. If your account activation email as expired please request a password reset."
+            )
 
         if not user.can_login():
-            raise AuthenticationFailure('This user account cannot log in at the moment.')
+            raise AuthenticationFailure("This user account cannot log in at the moment.")
 
         user_registry = get_user_registry(request)
         token = user_registry.get_session_token(user)
@@ -152,7 +154,9 @@ class DefaultLoginService:
 
         return self.do_post_login_actions(user, headers, location)
 
-    def authenticate_credentials(self, username: str, password: str, login_source: str, location: str=None) -> Response:
+    def authenticate_credentials(
+        self, username: str, password: str, login_source: str, location: str = None
+    ) -> Response:
         """Try logging in the user with username and password.
 
         This is called after the user credentials have been validated, after sign up when direct sign in after sign up is in use or after successful federated authentication.
@@ -172,7 +176,7 @@ class DefaultLoginService:
         user = self.check_credentials(username, password)
         return self.authenticate_user(user, login_source, location)
 
-    def logout(self, location: str=None) -> Response:
+    def logout(self, location: str = None) -> Response:
         """Log out user from the site.
 
         * Terminate session
@@ -184,7 +188,7 @@ class DefaultLoginService:
         """
         # TODO: Horus might go
         request = self.request
-        logout_redirect_view = get_config_route(request, 'websauna.logout_redirect')
+        logout_redirect_view = get_config_route(request, "websauna.logout_redirect")
         location = location or logout_redirect_view
 
         messages.add(request, msg="You are now logged out.", kind="success", msg_id="msg-logged-out")

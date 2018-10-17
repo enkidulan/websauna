@@ -51,7 +51,15 @@ class ResourceButton:
     #: The template used to render this button. Also overridable through the constructor.
     template = "crud/resource_button.html"
 
-    def __init__(self, id: t.Optional[str]=None, name: t.Optional[str]=None, template: t.Optional[str]=None, permission: t.Optional[str]=None, tooltip: t.Optional[str]=None, feature: t.Optional[str]=None):
+    def __init__(
+        self,
+        id: t.Optional[str] = None,
+        name: t.Optional[str] = None,
+        template: t.Optional[str] = None,
+        permission: t.Optional[str] = None,
+        tooltip: t.Optional[str] = None,
+        feature: t.Optional[str] = None,
+    ):
         """
         :param id: Id of the button to be used as HTML id
         :param name:  Human readable label of the button
@@ -202,11 +210,7 @@ class Listing(CRUDView):
 
     def paginate(self, template_context):
         """Create template variables for paginatoin results."""
-        batch = self.paginator.paginate(
-            template_context["query"],
-            self.request,
-            template_context["count"]
-        )
+        batch = self.paginator.paginate(template_context["query"], self.request, template_context["count"])
         template_context["batch"] = batch
 
     @view_config(context=CRUD, name="listing", renderer="crud/listing.html", permission="view")
@@ -273,7 +277,7 @@ class CSVListing(Listing):
     #: How many rows we buffer in a chunk before writing into a response
     buffered_rows = 100
 
-    @view_config(context=CRUD, name="csv-export", permission='view')
+    @view_config(context=CRUD, name="csv-export", permission="view")
     def listing(self):
         """Listing core."""
 
@@ -288,8 +292,7 @@ class CSVListing(Listing):
         response = Response()
         response.headers["Content-Type"] = "text/csv; charset={}".format(encoding)
         response.headers["Content-Disposition"] = "attachment;filename={filename}.{encoding}.csv".format(
-            filename=file_title,
-            encoding=encoding
+            filename=file_title, encoding=encoding
         )
 
         buf = StringIO()
@@ -331,6 +334,7 @@ class FormView(CRUDView):
 
     Use Deform form library. This views is abstract and it does not have dependency to any underlying model system like SQLAlchemy.
     """
+
     #: If the child class is not overriding the rendering loop, point this to a template which provides the page frame and ``crud_content`` block. For example use see :py:class:`websauna.system.user.adminviews.UserAdd`.
     base_template = "crud/base.html"
 
@@ -348,7 +352,9 @@ class FormView(CRUDView):
     def create_form(self, mode: EditMode, buttons=(), nested=None) -> deform.Form:
         model = self.get_model()
         assert getattr(self, "form_generator", None), "Class {} must define a form_generator".format(self)
-        return self.form_generator.generate_form(request=self.request, context=self.context, model=model, mode=mode, buttons=buttons)
+        return self.form_generator.generate_form(
+            request=self.request, context=self.context, model=model, mode=mode, buttons=buttons
+        )
 
     @abstractmethod
     def get_form(self) -> deform.Form:
@@ -387,13 +393,15 @@ class FormView(CRUDView):
         """
 
         resource_registry = form.resource_registry
-        assert isinstance(resource_registry, ResourceRegistry), "Websauna CRUD view got vanilla deform ResourceRegistry instance. To use widgets with dynamic JavaScript correctly you need to make sure you initialize websauna.system.form.resourceregistry.ResourceRegistry for your form object."
+        assert isinstance(
+            resource_registry, ResourceRegistry
+        ), "Websauna CRUD view got vanilla deform ResourceRegistry instance. To use widgets with dynamic JavaScript correctly you need to make sure you initialize websauna.system.form.resourceregistry.ResourceRegistry for your form object."
 
         resource_registry.pull_in_resources(self.request, form)
 
-    def _cleanup_integrity_error(self, form: deform.Form, model: type,
-                                 obj_id: t.Any, user_id: t.Any,
-                                 error: IntegrityError) -> (t.Any, User):
+    def _cleanup_integrity_error(
+        self, form: deform.Form, model: type, obj_id: t.Any, user_id: t.Any, error: IntegrityError
+    ) -> (t.Any, User):
         """After form data conflicts with data already on the DB,
         inspect the sqlalchemy error, pinpoint the responsible field,
         and prepare the deform.field to raise a meaninful validation error
@@ -420,7 +428,8 @@ class FormView(CRUDView):
         def validator(*args, **kw):
             # TODO: How to actually get an actual translated message?
             # Maybe force user to feed value from his app?
-            raise colander.Invalid(schema_node, msg='Value already exists.')
+            raise colander.Invalid(schema_node, msg="Value already exists.")
+
         schema_node.validator = validator
 
         transaction.abort()
@@ -456,7 +465,7 @@ class Show(FormView):
         """Get the dictionary that populates the form."""
         return form.schema.dictify(form_context)
 
-    @view_config(context=Resource, name="show", renderer="crud/show.html", permission='view')
+    @view_config(context=Resource, name="show", renderer="crud/show.html", permission="view")
     def show(self):
         """View for showing an individual object."""
         obj = self.get_object()
@@ -473,7 +482,15 @@ class Show(FormView):
 
         title = self.get_title()
         self.pull_in_widget_resources(form)
-        return dict(form=rendered_form, context=self.context, obj=obj, title=title, crud=crud, base_template=base_template, resource_buttons=resource_buttons)
+        return dict(
+            form=rendered_form,
+            context=self.context,
+            obj=obj,
+            title=title,
+            crud=crud,
+            base_template=base_template,
+            resource_buttons=resource_buttons,
+        )
 
 
 class Edit(FormView):
@@ -494,10 +511,7 @@ class Edit(FormView):
         return "Editing #{}".format(self.context.get_title())
 
     def get_buttons(self) -> t.Iterable[deform.form.Button]:
-        return (
-            deform.form.Button("save"),
-            deform.form.Button("cancel"),
-        )
+        return (deform.form.Button("save"), deform.form.Button("cancel"))
 
     def get_form(self) -> deform.form.Form:
         """Get a form used to edit this item."""
@@ -530,7 +544,7 @@ class Edit(FormView):
         """Turn the object to form editable format."""
         return form.schema.dictify(obj)
 
-    @view_config(context=Resource, name="edit", renderer="crud/edit.html", permission='edit')
+    @view_config(context=Resource, name="edit", renderer="crud/edit.html", permission="edit")
     def edit(self):
         """View for showing an individual object."""
 
@@ -586,7 +600,16 @@ class Edit(FormView):
 
         self.pull_in_widget_resources(form)
 
-        return dict(form=rendered_form, context=self.context, obj=obj, title=title, crud=crud, base_template=base_template, resource_buttons=self.get_resource_buttons(), current_view_name="Edit")
+        return dict(
+            form=rendered_form,
+            context=self.context,
+            obj=obj,
+            title=title,
+            crud=crud,
+            base_template=base_template,
+            resource_buttons=self.get_resource_buttons(),
+            current_view_name="Edit",
+        )
 
 
 class Add(FormView):
@@ -650,14 +673,11 @@ class Add(FormView):
         self.add_object(obj)
         return obj
 
-    def get_buttons(self)-> t.List[deform.form.Button]:
-        buttons = (
-            deform.form.Button("add"),
-            deform.form.Button("cancel"),
-        )
+    def get_buttons(self) -> t.List[deform.form.Button]:
+        buttons = (deform.form.Button("add"), deform.form.Button("cancel"))
         return buttons
 
-    @view_config(context=CRUD, name="add", renderer="crud/add.html", permission='add')
+    @view_config(context=CRUD, name="add", renderer="crud/add.html", permission="add")
     def add(self):
         """View for showing an individual object."""
 
@@ -680,7 +700,7 @@ class Add(FormView):
                 appstruct = form.validate(controls)
 
                 # Cannot update id, as it is read-only
-                if 'id' in appstruct:
+                if "id" in appstruct:
                     del appstruct["id"]
 
                 user_id = self.request.user.id
@@ -711,7 +731,15 @@ class Add(FormView):
 
         self.pull_in_widget_resources(form)
 
-        return dict(form=rendered_form, context=self.context, title=title, crud=crud, base_template=base_template, resource_buttons=self.get_resource_buttons(), current_view_name="Add")
+        return dict(
+            form=rendered_form,
+            context=self.context,
+            title=title,
+            crud=crud,
+            base_template=base_template,
+            resource_buttons=self.get_resource_buttons(),
+            current_view_name="Add",
+        )
 
 
 class Delete:
@@ -719,6 +747,7 @@ class Delete:
 
     This is an abstract item delete implementation; you must either set :py:attr:`deleter` callback or override :py:meth:`yes`.
     """
+
     base_template = "crud/base.html"
 
     #: callback ``deleter(request, context)`` which is called to perform the actual model specific delete operation.
@@ -751,7 +780,9 @@ class Delete:
         else:
             self.get_crud().delete_object(self.get_object())
 
-        messages.add(self.request, "Deleted {}".format(self.context.get_title()), msg_id="msg-item-deleted", kind="success")
+        messages.add(
+            self.request, "Deleted {}".format(self.context.get_title()), msg_id="msg-item-deleted", kind="success"
+        )
 
         return HTTPFound(self.request.resource_url(self.get_crud(), "listing"))
 
@@ -762,7 +793,7 @@ class Delete:
         """
         return HTTPFound(self.request.resource_url(self.context, "show"))
 
-    @view_config(context=Resource, name="delete", renderer="crud/delete.html", permission='delete')
+    @view_config(context=Resource, name="delete", renderer="crud/delete.html", permission="delete")
     def delete(self):
         """Delete view endpoint."""
         choices = (

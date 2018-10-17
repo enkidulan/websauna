@@ -27,14 +27,14 @@ except ImportError as e:
     raise ImportError("You need to install IPython to use this shell") from e
 
 
-def main(argv: t.List[str]=sys.argv):
+def main(argv: t.List[str] = sys.argv):
     """Execute the IPython shell prompt with Websauna configuration already initialised.
 
     :param argv: Command line arguments, second one needs to be the uri to a configuration file.
     :raises sys.SystemExit:
     """
     if len(argv) < 2:
-        usage_message(argv, additional_params='[var=value]')
+        usage_message(argv, additional_params="[var=value]")
 
     config_uri = get_config_uri(argv)
 
@@ -56,15 +56,12 @@ def main(argv: t.List[str]=sys.argv):
 
         imported_objects[name] = cls
 
-    feedback('', False)
-    feedback('Following classes and objects are available:', False)
+    feedback("", False)
+    feedback("Following classes and objects are available:", False)
     for var, val in imported_objects.items():
-        line = "{key:30}: {value}".format(
-            key=var,
-            value=str(val).replace('\n', ' ').replace('\r', ' ')
-        )
+        line = "{key:30}: {value}".format(key=var, value=str(val).replace("\n", " ").replace("\r", " "))
         feedback(line)
-    feedback('', False)
+    feedback("", False)
 
     embed(user_ns=imported_objects)
 

@@ -75,13 +75,17 @@ def is_sane_database(Base, session: Session):
                 try:
                     columns = [c["name"] for c in iengine.get_columns(table_name)]
                 except sqlalchemy.exc.NoSuchTableError:
-                    logger.error("Model %s declares table %s which does not exist in database %s", klass, table_name, engine)
+                    logger.error(
+                        "Model %s declares table %s which does not exist in database %s", klass, table_name, engine
+                    )
                     errors = True
                     break
 
                 if column.key not in columns:
                     # It is safe to stringify engine where as password should be blanked out by stars
-                    logger.error("Model %s declares column %s which does not exist in database %s", klass, column.key, engine)
+                    logger.error(
+                        "Model %s declares column %s which does not exist in database %s", klass, column.key, engine
+                    )
                     errors = True
 
     return not errors

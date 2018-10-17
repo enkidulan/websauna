@@ -21,7 +21,12 @@ def extract_uuid_to_slug(item):
     return uuid_to_slug(item.uuid)
 
 
-def convert_query_to_tuples(query: Query, first_column: t.Union[str, t.Callable], second_column: t.Union[str, t.Callable], default_choice: t.Optional[str] =None) -> t.List[t.Tuple[str, str]]:
+def convert_query_to_tuples(
+    query: Query,
+    first_column: t.Union[str, t.Callable],
+    second_column: t.Union[str, t.Callable],
+    default_choice: t.Optional[str] = None,
+) -> t.List[t.Tuple[str, str]]:
     """Convert SQLAlchemy query results to (id, name) tuples for select and checkbox widgets.
 
     :param first_column: Column name used to populate value in the first tuple
@@ -41,7 +46,7 @@ def convert_query_to_tuples(query: Query, first_column: t.Union[str, t.Callable]
     result = []
 
     if default_choice:
-        result.append(('', default_choice))
+        result.append(("", default_choice))
 
     for item in query:
         result.append((first_column_getter(item), second_column_getter(item)))
@@ -49,7 +54,9 @@ def convert_query_to_tuples(query: Query, first_column: t.Union[str, t.Callable]
     return result
 
 
-def get_uuid_vocabulary_for_model(dbsession: Session, model: type, first_column=extract_uuid_to_slug, second_column=str, default_choice=None) -> t.List[t.Tuple]:
+def get_uuid_vocabulary_for_model(
+    dbsession: Session, model: type, first_column=extract_uuid_to_slug, second_column=str, default_choice=None
+) -> t.List[t.Tuple]:
     """Create a select/checkbox vocabulary containing all items of a model."""
     query = dbsession.query(model).all()
     return convert_query_to_tuples(query, first_column, second_column, default_choice)
@@ -74,7 +81,7 @@ class ModelSchemaType:
     #: Name of the column which provides label or such for items in sequence. If not present item __str__ is used.
     label_column = None
 
-    def __init__(self, model: type=None):
+    def __init__(self, model: type = None):
         if model:
             self.model = model
 
@@ -120,7 +127,9 @@ class ForeignKeyValue(ModelSchemaType, colander.String):
         """
         return str(appstruct)
 
-    def query_item(self, node: colander.SchemaNode, dbsession: Session, model: type, match_column: Column, value: set) -> t.List[object]:
+    def query_item(
+        self, node: colander.SchemaNode, dbsession: Session, model: type, match_column: Column, value: set
+    ) -> t.List[object]:
         """Query the actual model to get the concrete SQLAlchemy objects."""
 
         if not value:
@@ -181,7 +190,9 @@ class ModelSet(ModelSchemaType, colander.Set):
         else:
             return [str(i) for i in appstruct]
 
-    def query_items(self, node: colander.SchemaNode, dbsession: Session, model: type, match_column: Column, values: set) -> t.List[object]:
+    def query_items(
+        self, node: colander.SchemaNode, dbsession: Session, model: type, match_column: Column, values: set
+    ) -> t.List[object]:
         """Query the actual model to get the concrete SQLAlchemy objects."""
         if not values:
             # Empty IN queries are not allowed
@@ -194,7 +205,7 @@ class ModelSet(ModelSchemaType, colander.Set):
             return colander.null
 
         if not is_nonstr_iter(cstruct):
-            raise colander.Invalid(node, '{} is not iterable'.format(cstruct))
+            raise colander.Invalid(node, "{} is not iterable".format(cstruct))
 
         return self.deserialize_set_to_models(node, cstruct)
 
@@ -234,7 +245,7 @@ class UUIDModelSet(ModelSet):
 
     match_column = "uuid"
 
-    def __init__(self, model: type=None, match_column: str=None):
+    def __init__(self, model: type = None, match_column: str = None):
         if model:
             self.model = model
 

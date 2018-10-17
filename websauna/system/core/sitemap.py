@@ -305,9 +305,7 @@ class ReflectiveSitemapBuilder:
         # create a new request to traverse based on detected route pattern
         # dbsession must be passed here to prevent creating new dbsession
         sample_request = make_routable_request(
-            dbsession=self.request.dbsession,
-            registry=self.request.registry,
-            path=start_path
+            dbsession=self.request.dbsession, registry=self.request.registry, path=start_path
         )
 
         root = route.factory(sample_request)
@@ -389,19 +387,14 @@ def _get_route_data(route, registry):
 
     pattern = _get_pattern(route)
 
-    request_iface = registry.queryUtility(
-        IRouteRequest,
-        name=route.name
-    )
+    request_iface = registry.queryUtility(IRouteRequest, name=route.name)
 
-    route_intr = registry.introspector.get(
-        'routes', route.name
-    )
+    route_intr = registry.introspector.get("routes", route.name)
 
     if request_iface is None:
         return
 
-    if route_intr.get('static', False) is True:
+    if route_intr.get("static", False) is True:
         return
 
     view_intr = registry.introspector.related(route_intr)
@@ -411,7 +404,7 @@ def _get_route_data(route, registry):
             yield route.name, pattern, view
 
 
-def include_in_sitemap(include: t.Optional[bool]=None, condition: t.Optional[t.Callable]=None):
+def include_in_sitemap(include: t.Optional[bool] = None, condition: t.Optional[t.Callable] = None):
     """A function decorator to determine if a view should be included in the automatically generated sitemap.
 
     You need to give either ``include`` argument or ``condition``. If this view decorator is not present the view is always included.

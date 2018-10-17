@@ -153,7 +153,9 @@ def test_set_password(browser, victim_browser, web_server, init, dbsession):
     b2 = victim_browser
 
     create_logged_in_user(dbsession, init.config.registry, web_server, browser, admin=True)
-    create_logged_in_user(dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret")
+    create_logged_in_user(
+        dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret"
+    )
 
     b.find_by_css("#nav-admin").click()
     b.find_by_css("#latest-user-shortcut").click()
@@ -186,7 +188,9 @@ def test_set_email(browser, victim_browser, web_server, init, dbsession):
     b2 = victim_browser
 
     create_logged_in_user(dbsession, init.config.registry, web_server, browser, admin=True)
-    create_logged_in_user(dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret")
+    create_logged_in_user(
+        dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret"
+    )
 
     b.find_by_css("#nav-admin").click()
     b.find_by_css("#latest-user-shortcut").click()
@@ -217,7 +221,9 @@ def test_set_enabled(browser: DriverAPI, victim_browser, web_server, init, dbses
     b2 = victim_browser
 
     create_logged_in_user(dbsession, init.config.registry, web_server, browser, admin=True)
-    create_logged_in_user(dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret")
+    create_logged_in_user(
+        dbsession, init.config.registry, web_server, b2, email="victim@example.com", password="secret"
+    )
 
     b.find_by_css("#nav-admin").click()
     b.find_by_css("#latest-user-shortcut").click()
@@ -319,7 +325,9 @@ def test_csv_export_users(dbsession, registry, browser, web_server):
 
     b.find_by_css("#nav-admin").click()
     b.find_by_css("#btn-panel-list-user").click()
-    assert b.is_element_present_by_css("#btn-crud-csv-export")  # This button would trigger the download of CSV that we normally cannot test with Selenium
+    assert b.is_element_present_by_css(
+        "#btn-crud-csv-export"
+    )  # This button would trigger the download of CSV that we normally cannot test with Selenium
 
     # Copy session cookie over to request, so we can do an authenticated user request using requests lib
     cookies = b.driver.get_cookies()

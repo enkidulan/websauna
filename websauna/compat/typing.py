@@ -9,15 +9,20 @@ class DirEntry(Generic[AnyStr]):  # noqa: F405
     # This is what the scandir interator yields
     # The constructor is hidden
 
-    name = ''
-    path = ''
+    name = ""
+    path = ""
 
-    def inode(self) -> int: ...  # noqa: E704
+    def inode(self) -> int:
+        ...  # noqa: E704
 
-    def is_dir(self, follow_symlinks: bool = ...) -> bool: ...  # noqa: E704
+    def is_dir(self, follow_symlinks: bool = ...) -> bool:
+        ...  # noqa: E704
 
-    def is_file(self, follow_symlinks: bool = ...) -> bool: ...  # noqa: E704
+    def is_file(self, follow_symlinks: bool = ...) -> bool:
+        ...  # noqa: E704
 
-    def is_symlink(self) -> bool: ...  # noqa: E704
+    def is_symlink(self) -> bool:
+        ...  # noqa: E704
 
-    def stat(self) -> stat_result: ...  # noqa: E704
+    def stat(self) -> stat_result:
+        ...  # noqa: E704

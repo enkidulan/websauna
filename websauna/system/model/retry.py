@@ -43,7 +43,11 @@ def ensure_transactionless(msg=None, transaction_manager=transaction.manager):
             msg = "Dangling transction open in transaction.manager. You should not start new one."
 
         transaction_thread = getattr(transaction.manager, "begin_thread", None)
-        logger.fatal("Transaction state management error. Trying to start TX in thread %s. TX started in thread %s", threading.current_thread(), transaction_thread)
+        logger.fatal(
+            "Transaction state management error. Trying to start TX in thread %s. TX started in thread %s",
+            threading.current_thread(),
+            transaction_thread,
+        )
 
         # Destroy the transaction, so if this was a temporary failure in long running process, we don't lock the process up for the good
         txn.abort()
@@ -68,12 +72,12 @@ def is_retryable(txn, error):
         return False
 
     for dm in txn._resources:
-        should_retry = getattr(dm, 'should_retry', None)
+        should_retry = getattr(dm, "should_retry", None)
         if (should_retry is not None) and should_retry(error):
             return True
 
 
-def retryable(tm: t.Optional[TransactionManager]=None, get_tm: t.Optional[t.Callable]=None):
+def retryable(tm: t.Optional[TransactionManager] = None, get_tm: t.Optional[t.Callable] = None):
     """Function decorator for§ SQL Serialized transaction conflict resolution through retries.
 
     You need to give either ``tm`` or ``get_tm`` argument.
@@ -145,7 +149,6 @@ def retryable(tm: t.Optional[TransactionManager]=None, get_tm: t.Optional[t.Call
     """
 
     def _transaction_retry_wrapper(func):
-
         @wraps(func)
         def decorated_func(*args, **kwargs):
 
@@ -182,7 +185,11 @@ def retryable(tm: t.Optional[TransactionManager]=None, get_tm: t.Optional[t.Call
                         txn.commit()
                     except ValueError as ve:
                         # Means there was a nested transaction begin
-                        raise TooDeepInTransactions("Looks like transaction.commit() failed - usually this means that the wrapped function {} begun its own transaction and ruined transaction state management".format(func)) from ve
+                        raise TooDeepInTransactions(
+                            "Looks like transaction.commit() failed - usually this means that the wrapped function {} begun its own transaction and ruined transaction state management".format(
+                                func
+                            )
+                        ) from ve
 
                     return val
                 except Exception as e:
@@ -193,7 +200,9 @@ def retryable(tm: t.Optional[TransactionManager]=None, get_tm: t.Optional[t.Call
                         txn.abort()  # We could not commit
                         raise e
 
-            raise CannotRetryAnymore("Out of transaction retry attempts, tried {} times".format(num + 1)) from latest_exc
+            raise CannotRetryAnymore(
+                "Out of transaction retry attempts, tried {} times".format(num + 1)
+            ) from latest_exc
 
         return decorated_func
 

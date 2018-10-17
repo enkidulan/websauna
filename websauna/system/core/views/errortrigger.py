@@ -12,7 +12,7 @@ from websauna.system.core.loggingcapture import get_logging_user_context
 logger = logging.getLogger(__name__)
 
 
-@view_config(route_name='error_trigger')
+@view_config(route_name="error_trigger")
 def error_trigger(request):
     """An error logging view to generate a run-time error.
     """

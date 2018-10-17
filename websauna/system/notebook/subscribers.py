@@ -15,6 +15,6 @@ def contribute_admin(event):
         label="Shell",
         icon="fa-terminal",
         route_name="admin_shell",
-        condition=lambda entry, request: request.has_permission('shell')
+        condition=lambda entry, request: request.has_permission("shell"),
     )
     admin.get_quick_menu().add_entry(entry)

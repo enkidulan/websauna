@@ -32,14 +32,13 @@ class Admin(Resource):
     #: Default permissions of who can add, read and write things in admin
     __acl__ = [
         # Declare admin rights
-        (Allow, 'group:admin', 'add'),
-        (Allow, 'group:admin', 'view'),
-        (Allow, 'group:admin', 'edit'),
-        (Allow, 'group:admin', 'delete'),
-        (Allow, 'superuser:superuser', 'shell'),
-
+        (Allow, "group:admin", "add"),
+        (Allow, "group:admin", "view"),
+        (Allow, "group:admin", "edit"),
+        (Allow, "group:admin", "delete"),
+        (Allow, "superuser:superuser", "shell"),
         # Disable access to public users
-        (Deny, Everyone, 'view'),  # Declared in websauna.system.core.root.Root
+        (Deny, Everyone, "view"),  # Declared in websauna.system.core.root.Root
     ]
 
     def __init__(self, request):
@@ -72,8 +71,12 @@ class Admin(Resource):
     def construct_default_menu(self):
         """Setup admin main menu."""
 
-        self.admin_menu_entry = menu.NavbarEntry("admin-menu-navbar", label=None, submenu=menu.Menu(), css_class="navbar-admin")
-        self.quick_menu_entry = menu.RouteEntry("admin-menu-quick", "Admin", "admin_home", icon="fa-wrench", submenu=menu.Menu())
+        self.admin_menu_entry = menu.NavbarEntry(
+            "admin-menu-navbar", label=None, submenu=menu.Menu(), css_class="navbar-admin"
+        )
+        self.quick_menu_entry = menu.RouteEntry(
+            "admin-menu-quick", "Admin", "admin_home", icon="fa-wrench", submenu=menu.Menu()
+        )
 
         home = menu.RouteEntry("admin-quick-menu-home", "Dashboard", "admin_home", icon="fa-wrench")
         self.quick_menu_entry.submenu.add_entry(home)

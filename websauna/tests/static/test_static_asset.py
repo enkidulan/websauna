@@ -40,7 +40,10 @@ def test_collect_static_asset():
     collected = sap.collect_static()
 
     # Check one resource from the collectin to see we succeeded
-    assert collected["websauna-static"]["pyramid-32x32.png"] == 'perma-asset/pyramid-32x32.c453183eee6627ff09e49f0384cededd.png'
+    assert (
+        collected["websauna-static"]["pyramid-32x32.png"]
+        == "perma-asset/pyramid-32x32.c453183eee6627ff09e49f0384cededd.png"
+    )
 
 
 def test_collect_recurse():
@@ -54,7 +57,9 @@ def test_collect_recurse():
     assert len(collected) > 0
 
     # Check one resource from the collectin to see we succeeded
-    assert collected["deform-static"]["pickadate/translations/ja_JP.js"].startswith('perma-asset/pickadate/translations/ja_JP.')
+    assert collected["deform-static"]["pickadate/translations/ja_JP.js"].startswith(
+        "perma-asset/pickadate/translations/ja_JP."
+    )
 
 
 def test_map_static_asset(browser, caching_web_server):

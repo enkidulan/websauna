@@ -48,7 +48,7 @@ class INET(IPAddressType):
     """
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name == "postgresql":
             # Fallback to native PSQL INET
             return dialect.type_descriptor(_INET())
         else:
@@ -79,11 +79,11 @@ class UUID(UUIDType):
     #: We force PSQL implementation by default here so that Alembic migration scripts don't do a column with unnecessary length attribute: sa.Column('uuid', websauna.system.model.columns.UUID(length=16), nullable=True),
     impl = postgresql.UUID()
 
-    def __init__(self, as_uuid: bool=True):
+    def __init__(self, as_uuid: bool = True):
         super(UUID, self).__init__(binary=True, native=True)
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql' and self.native:
+        if dialect.name == "postgresql" and self.native:
             # Use the native UUID type.
             return dialect.type_descriptor(postgresql.UUID())
         else:
@@ -93,8 +93,4 @@ class UUID(UUIDType):
 
 
 # Don't expose sqlalchemy_utils internals as they may go away
-__all__ = [
-    'UTCDateTime',
-    'UUID',
-    'INET',
-]
+__all__ = ["UTCDateTime", "UUID", "INET"]

@@ -42,9 +42,13 @@ def backup_site():
     resolver = AssetResolver(None)
     backup_script = resolver.resolve(backup_script_spec).abspath()
 
-    assert os.path.exists(backup_script), "Backup script does not exist: {}, spec {}".format(backup_script, backup_script_spec)
+    assert os.path.exists(backup_script), "Backup script does not exist: {}, spec {}".format(
+        backup_script, backup_script_spec
+    )
 
-    assert stat.S_IXUSR & os.stat(backup_script)[stat.ST_MODE], "Backup script is not executable: {}".format(backup_script)
+    assert stat.S_IXUSR & os.stat(backup_script)[stat.ST_MODE], "Backup script is not executable: {}".format(
+        backup_script
+    )
 
     backup_timeout = int(registry.settings.get("websauna.backup_timeout"))
 
@@ -52,7 +56,7 @@ def backup_site():
     env = create_settings_env(registry)
 
     try:
-        subprocess.check_output([backup_script, ], timeout=backup_timeout, stderr=subprocess.STDOUT, env=env)
+        subprocess.check_output([backup_script], timeout=backup_timeout, stderr=subprocess.STDOUT, env=env)
     except subprocess.CalledProcessError as e:
         # Capture error to Sentry
         logger.error(e.output)

@@ -21,10 +21,10 @@ def tutorial_app(request, paster_config):
     """Custom WSGI app with travesal points for sitemap enabled."""
 
     class Initializer(websauna.system.DemoInitializer):
-
         def run(self):
             super(Initializer, self).run()
             from websauna.tests.crud import tutorial
+
             self.config.scan(tutorial)
 
     global_config, app_settings = paster_config

@@ -73,7 +73,8 @@ def run_migrations_offline(url, target_metadata, version_table, include_object):
         literal_binds=True,
         version_table=version_table,
         include_object=include_object,
-        compare_types=True)
+        compare_types=True,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -242,7 +243,11 @@ def run_alembic(package: str):
     if context.is_offline_mode():
         run_migrations_offline(url, target_metadata, version_table, include_object)
     else:
-        logger.info("Starting online migration engine on database connection {} version history table {}".format(engine, version_table))
+        logger.info(
+            "Starting online migration engine on database connection {} version history table {}".format(
+                engine, version_table
+            )
+        )
         run_migrations_online(engine, target_metadata, version_table, include_object)
 
     # TODO: If a migration file is written, post-edit it and add websauna import

@@ -55,7 +55,15 @@ def render_templated_mail(request: Request, template: str, context: dict) -> t.T
     return subject, text_body, html_body
 
 
-def send_templated_mail(request: Request, recipients: t.List, template: str, context: dict, sender=None, immediate=None, tm: t.Optional[TransactionManager]=None) -> t.Tuple[str, str, str]:
+def send_templated_mail(
+    request: Request,
+    recipients: t.List,
+    template: str,
+    context: dict,
+    sender=None,
+    immediate=None,
+    tm: t.Optional[TransactionManager] = None,
+) -> t.Tuple[str, str, str]:
     """Send out templatized HTML and plain text emails.
 
     Each HTML email should have a plain text fallback. Premailer package is used to convert any CSS styles in HTML email messages to inline, so that email clients display them.
@@ -125,7 +133,7 @@ def send_templated_mail(request: Request, recipients: t.List, template: str, con
         # Add enveloped From:
         sender_name = request.registry.settings.get("mail.default_sender_name")
         if sender_name:
-            sender = formataddr((str(Header(sender_name, 'utf-8')), sender))
+            sender = formataddr((str(Header(sender_name, "utf-8")), sender))
 
     message = Message(subject=subject, sender=sender, recipients=recipients, body=text_body, html=html_body)
     message.validate()

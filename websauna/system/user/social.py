@@ -115,7 +115,7 @@ class EmailSocialLoginMapper:
         User = self.registry.queryUtility(IUserModel)
         dbsession = request.dbsession
         imported_data = self.import_social_media_user(user)
-        email = imported_data['email']
+        email = imported_data["email"]
         user = self.get_existing_user(User, dbsession, email)
         if not user:
             user = self.create_blank_user(User, dbsession, email)
@@ -182,7 +182,9 @@ class FacebookMapper(EmailSocialLoginMapper):
         assert not result.error
         # Facebook specific Authomatic call to fetch more user data from the Facebook provider
         # https://github.com/peterhudec/authomatic/issues/112
-        result.user.provider.user_info_url = 'https://graph.facebook.com/me?fields=id,email,name,first_name,last_name,gender,link,timezone,verified'
+        result.user.provider.user_info_url = (
+            "https://graph.facebook.com/me?fields=id,email,name,first_name,last_name,gender,link,timezone,verified"
+        )
         result.user.update()
 
         # Make user Facebook user looks somewhat legit
@@ -192,7 +194,9 @@ class FacebookMapper(EmailSocialLoginMapper):
         if not result.user.email:
             # We cannot login if the Facebook doesnt' give us email as we use it for the user mapping
             # This can also happen when you have not configured Facebook app properly in the developers.facebook.com
-            raise NotSatisfiedWithData("Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead.")
+            raise NotSatisfiedWithData(
+                "Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead."
+            )
 
         return self.get_or_create_user_by_social_medial_email(request, result.user)
 
@@ -250,7 +254,9 @@ class GoogleMapper(EmailSocialLoginMapper):
         if not result.user.email:
             # We cannot login if the Facebook doesnt' give us email as we use it for the user mapping
             # This can also happen when you have not configured Facebook app properly in the developers.facebook.com
-            raise NotSatisfiedWithData("Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead.")
+            raise NotSatisfiedWithData(
+                "Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead."
+            )
 
         return self.get_or_create_user_by_social_medial_email(request, result.user)
 
@@ -300,7 +306,9 @@ class TwitterMapper(EmailSocialLoginMapper):
 
         # We need to pass include_email=true
         # https://dev.twitter.com/rest/reference/get/account/verify_credentials
-        result.provider.user_info_url = "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true"
+        result.provider.user_info_url = (
+            "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true"
+        )
 
         result.user.update()
 
@@ -310,6 +318,8 @@ class TwitterMapper(EmailSocialLoginMapper):
         if not result.user.email:
             # We cannot login if the Facebook doesnt' give us email as we use it for the user mapping
             # This can also happen when you have not configured Facebook app properly in the developers.facebook.com
-            raise NotSatisfiedWithData("Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead.")
+            raise NotSatisfiedWithData(
+                "Email address is needed in order to user this service and we could not get one from your social media provider. Please try to sign up with your email instead."
+            )
 
         return self.get_or_create_user_by_social_medial_email(request, result.user)

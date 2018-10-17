@@ -29,16 +29,13 @@ from websauna.utils.time import now
 #: Initialze user_data JSONB structure with these fields on new User
 DEFAULT_USER_DATA = {
     "full_name": None,
-
     # The initial sign up method (email, phone no, imported, Facebook) for this user
     "registration_source": None,
-
     # Is it the first time this user is logging to our system? If it is then take the user to fill in the profile page.
     "first_login": True,
-
     "social": {
         # Each of the social media login data imported here as it goes through SocialLoginMapper.import_social_media_user()
-    }
+    },
 }
 
 
@@ -62,7 +59,7 @@ class UserMixin:
     email = Column(String(256), nullable=True, unique=True)
 
     #: Stores the password + hash + cycles as password hasher internal format.. By default uses Argon 2 format. See :py:meth:`websauna.system.Initializer.configure_password`
-    hashed_password = Column('password', String(256), nullable=True)
+    hashed_password = Column("password", String(256), nullable=True)
 
     #: When this account was created
     created_at = Column(UTCDateTime, default=now)
@@ -112,7 +109,7 @@ class UserMixin:
         if full_name:
             # Return full_name if available
             friendly_name = full_name
-        elif username and not username.startswith('user-'):
+        elif username and not username.startswith("user-"):
             # Get the username if it looks like non-automatic form
             friendly_name = username
 
@@ -124,7 +121,7 @@ class UserMixin:
         In the format user-{id}.
         """
         assert self.id
-        return 'user-{id}'.format(id=self.id)
+        return "user-{id}".format(id=self.id)
 
     def is_activated(self) -> bool:
         """Has the user completed the email activation."""
@@ -163,7 +160,7 @@ class GroupMixin:
     """Basic fields for Websauna default group model."""
 
     #: Assign the first user initially to this group
-    DEFAULT_ADMIN_GROUP_NAME = 'admin'
+    DEFAULT_ADMIN_GROUP_NAME = "admin"
 
     #: Running counter id of the group
     id = Column(Integer, autoincrement=True, primary_key=True)

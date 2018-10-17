@@ -40,11 +40,9 @@ class Question(Base):
     #: Relationship mapping between question and choice.
     #: Each choice can have only question.
     #: Deleteing question deletes its choices.
-    choices = relationship("Choice",
-                           back_populates="question",
-                           lazy="dynamic",
-                           cascade="all, delete-orphan",
-                           single_parent=True)
+    choices = relationship(
+        "Choice", back_populates="question", lazy="dynamic", cascade="all, delete-orphan", single_parent=True
+    )
 
     def is_recent(self):
         return self.published_at >= now() - datetime.timedelta(days=1)
@@ -75,7 +73,7 @@ class Choice(Base):
     votes = Column(Integer, default=0)
 
     #: Which question this choice is part of
-    question_id = Column(Integer, ForeignKey('question.id'))
+    question_id = Column(Integer, ForeignKey("question.id"))
     question = relationship("Question", back_populates="choices", uselist=False)
 
     def __repr__(self):
@@ -97,7 +95,6 @@ class QuestionAdmin(ModelAdmin):
     model = Question
 
     class Resource(ModelAdmin.Resource):
-
         def get_title(self):
             return self.get_object().question_text
 
@@ -112,6 +109,5 @@ class ChoiceAdmin(ModelAdmin):
     model = Choice
 
     class Resource(ModelAdmin.Resource):
-
         def get_title(self):
             return self.get_object().choice_text

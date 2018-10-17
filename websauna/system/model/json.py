@@ -77,7 +77,7 @@ class WebsaunaFriendlyMutable(Mutable):
                 if getattr(prop.columns[0].type, "_column_value_id", None) == sqltype._column_value_id:
                     cls.associate_with_attribute(getattr(class_, prop.key))
 
-        event.listen(mapper, 'mapper_configured', listen_for_type)
+        event.listen(mapper, "mapper_configured", listen_for_type)
 
         return sqltype
 
@@ -85,6 +85,7 @@ class WebsaunaFriendlyMutable(Mutable):
 class MutationDict(WebsaunaFriendlyMutable):
     """http://www.sqlalchemy.org/docs/orm/extensions/mutable.html
     """
+
     _wraps = dict
 
     def __init__(self, data):
@@ -101,9 +102,12 @@ class MutationDict(WebsaunaFriendlyMutable):
             return value
 
     def __json__(self, request=None):
-        return dict([(key, value.__json__(request))
-                     if hasattr(value, '__json__') else (key, value)
-                     for key, value in self._d.items()])
+        return dict(
+            [
+                (key, value.__json__(request)) if hasattr(value, "__json__") else (key, value)
+                for key, value in self._d.items()
+            ]
+        )
 
 
 class MutationList(WebsaunaFriendlyMutable):
@@ -126,8 +130,7 @@ class MutationList(WebsaunaFriendlyMutable):
         return other + self._d
 
     def __json__(self, request=None):
-        return [item.__json__(request) if hasattr(item, '__json__') else item
-                for item in self._d]
+        return [item.__json__(request) if hasattr(item, "__json__") else item for item in self._d]
 
 
 def _make_mutable_method_wrapper(wrapper_class, methodname, mutates):
@@ -144,38 +147,33 @@ def _make_mutable_method_wrapper(wrapper_class, methodname, mutates):
 
 for wrapper_class in (MutationDict, MutationList):
     for methodname, mutates in (
-            ('__iter__', False),
-            ('__len__', False),
-            ('__eq__', False),
-            ('__add__', False),
-            ('__getitem__', False),
-            ('__getslice__', False),
-            ('__repr__', False),
-            ('get', False),
-            ('keys', False),
-            ('values', False),
-            ('items', False),
-
-            ('__setitem__', True),
-            ('__delitem__', True),
-            ('__setslice__', True),
-            ('__delslice__', True),
-            ('append', True),
-            ('clear', True),
-            ('extend', True),
-            ('insert', True),
-            ('pop', True),
-            ('setdefault', True),
-            ('update', True),
-            ('remove', True),
+        ("__iter__", False),
+        ("__len__", False),
+        ("__eq__", False),
+        ("__add__", False),
+        ("__getitem__", False),
+        ("__getslice__", False),
+        ("__repr__", False),
+        ("get", False),
+        ("keys", False),
+        ("values", False),
+        ("items", False),
+        ("__setitem__", True),
+        ("__delitem__", True),
+        ("__setslice__", True),
+        ("__delslice__", True),
+        ("append", True),
+        ("clear", True),
+        ("extend", True),
+        ("insert", True),
+        ("pop", True),
+        ("setdefault", True),
+        ("update", True),
+        ("remove", True),
     ):
         # Only wrap methods that do exist on the wrapped type!
         if getattr(wrapper_class._wraps, methodname, False):
-            setattr(
-                wrapper_class, methodname,
-                _make_mutable_method_wrapper(
-                    wrapper_class, methodname, mutates),
-            )
+            setattr(wrapper_class, methodname, _make_mutable_method_wrapper(wrapper_class, methodname, mutates))
 
 
 class NestedMixin(object):
@@ -185,7 +183,7 @@ class NestedMixin(object):
     __parent__ = None
 
     def __init__(self, *args, **kwargs):
-        self.__parent__ = kwargs.pop('__parent__', None)
+        self.__parent__ = kwargs.pop("__parent__", None)
         super(NestedMixin, self).__init__(*args, **kwargs)
 
     def __getitem__(self, key):
@@ -231,10 +229,7 @@ class NestedMutationList(NestedMixin, MutationList):
     pass
 
 
-MUTATION_WRAPPERS = {
-    dict: NestedMutationDict,
-    list: NestedMutationList,
-}
+MUTATION_WRAPPERS = {dict: NestedMutationDict, list: NestedMutationList}
 
 
 def wrap_as_nested(key: str, data: object, parent: object) -> object:

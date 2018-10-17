@@ -133,7 +133,6 @@ def test_instance(dbsession):
 
 @pytest.fixture
 def dbsession_factory(test_request):
-
     def factory():
         dbsession = create_dbsession(test_request.registry, manager=None)
         # Retry each transaction max 1 times

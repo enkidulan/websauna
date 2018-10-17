@@ -31,6 +31,7 @@ class simple_route(object):
         :lines: 4-
 
     """
+
     def __init__(self, path, *args, **kwargs):
         """Constructor just here to accept parameters for decorator"""
         self.path = path
@@ -48,24 +49,31 @@ class simple_route(object):
 
             # Default to not appending slash
             if "append_slash" not in kwargs:
-                kwargs['append_slash'] = False
+                kwargs["append_slash"] = False
 
             # pylint: disable=W0142
             add_simple_route(config, self.path, wrapped, *args, **kwargs)
 
         info = venusian.attach(wrapped, callback)
 
-        if info.scope == 'class':  # pylint:disable=E1101
+        if info.scope == "class":  # pylint:disable=E1101
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there
-            if kwargs.get('attr') is None:
-                kwargs['attr'] = wrapped.__name__
+            if kwargs.get("attr") is None:
+                kwargs["attr"] = wrapped.__name__
 
         return wrapped
 
 
-def add_template_only_view(config: Configurator, pattern: str, name: str, template: str, view_args: t.Optional[dict]=None, route_args: t.Optional[dict]=None):
+def add_template_only_view(
+    config: Configurator,
+    pattern: str,
+    name: str,
+    template: str,
+    view_args: t.Optional[dict] = None,
+    route_args: t.Optional[dict] = None,
+):
     """Adds a view which do not have a specific view function assgined.
 
     The view will render a template with the default template context.
@@ -76,6 +84,7 @@ def add_template_only_view(config: Configurator, pattern: str, name: str, templa
     :param view_args: kwargs passed to :py:meth:`pyramid.config.Configurator.add_view`
     :param route_args: kwargs passed to :py:meth:`pyramid.config.Configurator.add_view`
     """
+
     def _default_view(request):
         return {}
 

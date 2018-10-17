@@ -23,15 +23,17 @@ class Column:
     format = "MM/DD/YYYY HH:mm"
 
     def __init__(
-            self,
-            id: str,
-            name: t.Optional[str]=None,
-            renderer=None,
-            header_template: t.Optional[str]=None,
-            body_template: t.Optional[str]=None,
-            getter: t.Optional[t.Callable]=None,
-            format: t.Optional[str]=None,
-            navigate_view_name=None, navigate_url_getter=None):
+        self,
+        id: str,
+        name: t.Optional[str] = None,
+        renderer=None,
+        header_template: t.Optional[str] = None,
+        body_template: t.Optional[str] = None,
+        getter: t.Optional[t.Callable] = None,
+        format: t.Optional[str] = None,
+        navigate_view_name=None,
+        navigate_url_getter=None,
+    ):
         """Initialize Column.
 
         :param id: Column id. Must match field id on the model
@@ -74,7 +76,7 @@ class Column:
             val = getattr(obj, self.id)
 
         if val is None:
-            val = ''
+            val = ""
         return val
 
     def get_navigate_target(self, resource: Resource, request: Request):
@@ -87,7 +89,7 @@ class Column:
         """
         return resource
 
-    def get_navigate_url(self, resource: Resource, request: Request, view_name: t.Optional[str]=None):
+    def get_navigate_url(self, resource: Resource, request: Request, view_name: t.Optional[str] = None):
         """Get the link where clicking this item should take the user.
 
         By default, navigate to "show" view of the resource.
@@ -127,7 +129,7 @@ class StringPresentationColumn(Column):
 
     def __init__(self, **kwargs):
         """Initialize StringPresentationColumn. """
-        self.formatter = kwargs.pop('formatter', str)
+        self.formatter = kwargs.pop("formatter", str)
         super(StringPresentationColumn, self).__init__(**kwargs)
 
     def get_value(self, view, obj):
@@ -143,11 +145,11 @@ class ControlsColumn(Column):
     """Render View / Edit / Delete buttons."""
 
     def __init__(
-            self,
-            id: str='controls',
-            name: t.Optional[str]='Actions',
-            header_template: t.Optional[str]='crud/column_header_controls.html',
-            body_template: t.Optional[str]='crud/column_body_controls.html'
+        self,
+        id: str = "controls",
+        name: t.Optional[str] = "Actions",
+        header_template: t.Optional[str] = "crud/column_header_controls.html",
+        body_template: t.Optional[str] = "crud/column_body_controls.html",
     ):
         """Initialize ControlsColumn.
 
@@ -156,20 +158,22 @@ class ControlsColumn(Column):
         :param header_template: Path to header template to be used.
         :param body_template: Path to body template to be used.
         """
-        super(ControlsColumn, self).__init__(id=id, name=name, header_template=header_template, body_template=body_template)
+        super(ControlsColumn, self).__init__(
+            id=id, name=name, header_template=header_template, body_template=body_template
+        )
 
 
 class FriendlyTimeColumn(Column):
     """Print both accurate time and humanized relative time."""
 
     def __init__(
-            self,
-            id: str,
-            name: str,
-            navigate_view_name: t.Optional[str]=None,
-            timezone: t.Optional[str]=None,
-            header_template: t.Optional[str]=None,
-            body_template: t.Optional[str]='crud/column_body_friendly_time.html'
+        self,
+        id: str,
+        name: str,
+        navigate_view_name: t.Optional[str] = None,
+        timezone: t.Optional[str] = None,
+        header_template: t.Optional[str] = None,
+        body_template: t.Optional[str] = "crud/column_body_friendly_time.html",
     ):
         """Initialize FriendlyTimeColumn.
 
@@ -183,13 +187,19 @@ class FriendlyTimeColumn(Column):
         if timezone:
             self.timezone = timezone
 
-        super(FriendlyTimeColumn, self).__init__(id=id, name=name, navigate_view_name=navigate_view_name, header_template=header_template, body_template=body_template)
+        super(FriendlyTimeColumn, self).__init__(
+            id=id,
+            name=name,
+            navigate_view_name=navigate_view_name,
+            header_template=header_template,
+            body_template=body_template,
+        )
 
 
 class Table:
     """Describe table columns to a CRUD listing view."""
 
-    def __init__(self, columns: t.Optional[t.List[Column]]=None):
+    def __init__(self, columns: t.Optional[t.List[Column]] = None):
         """Initialize Table.
 
         :param columns: List of columns to be used to render the list view.

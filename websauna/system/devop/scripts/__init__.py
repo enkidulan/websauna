@@ -27,20 +27,20 @@ Instead, please use the following command;
 """
 
 
-def feedback(message: str, display_border: bool=True):
+def feedback(message: str, display_border: bool = True):
     """Display a feedback message on the console then exit.
 
     :param message: Message to be displayed to the user.
     :raises sys.SystemExit:
     """
     if display_border:
-        border = '=' * 100
-        message = '{border}\n{message}\n{border}'.format(border=border, message=message)
+        border = "=" * 100
+        message = "{border}\n{message}\n{border}".format(border=border, message=message)
     message = dedent(message)
     print(message)
 
 
-def feedback_and_exit(message: str, status_code: t.Optional[int]=None, display_border: bool=True):
+def feedback_and_exit(message: str, status_code: t.Optional[int] = None, display_border: bool = True):
     """Display a feedback message on the console then exit.
 
     :param message: Message to be displayed to the user.
@@ -61,7 +61,7 @@ def get_config_uri(argv: t.List[str]) -> str:
     return prepare_config_uri(config_uri)
 
 
-def usage_message(argv: t.List[str], additional_params: str='', additional_line: t.Optional[str]=None):
+def usage_message(argv: t.List[str], additional_params: str = "", additional_line: t.Optional[str] = None):
     """Display usage message and exit.
 
     :param argv: Command line arguments.
@@ -71,9 +71,7 @@ def usage_message(argv: t.List[str], additional_params: str='', additional_line:
     """
     cmd = os.path.basename(argv[0])
     msg = 'usage: {cmd} <config_uri> {params}\n(example: "{cmd} ws://conf/production.ini{line}")'.format(
-        cmd=cmd,
-        params=additional_params,
-        line='' if not additional_line else '\n{0}'.format(additional_line)
+        cmd=cmd, params=additional_params, line="" if not additional_line else "\n{0}".format(additional_line)
     )
     feedback_and_exit(msg, status_code=1, display_border=False)
 
@@ -103,8 +101,6 @@ def proxy_to_pyramid_script(script: str, argv: t.List[str]):
     argv[1] = config_uri
     display_deprecation_warning(script, config_uri)
     try:
-        sys.exit(
-            load_entry_point('pyramid', 'console_scripts', script)()
-        )
+        sys.exit(load_entry_point("pyramid", "console_scripts", script)())
     except SanityCheckFailed as exc:
         feedback_and_exit(FAIL_MSG.format(exception=str(exc)), 1)

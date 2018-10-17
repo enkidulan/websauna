@@ -25,7 +25,7 @@ Config {config_uri} was not found.
 """
 
 
-def main(argv: t.List[str]=sys.argv):
+def main(argv: t.List[str] = sys.argv):
     """Execute a sanity check on the configuration.
 
     :param argv: Command line arguments, second one needs to be the uri to a configuration file.

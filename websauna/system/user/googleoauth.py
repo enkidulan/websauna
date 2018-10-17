@@ -48,12 +48,11 @@ class Google(OAuth2):
 
     """
 
-    user_authorization_url = 'https://accounts.google.com/o/oauth2/auth'
-    access_token_url = 'https://accounts.google.com/o/oauth2/token'
-    user_info_url = 'https://www.googleapis.com/oauth2/v3/userinfo?alt=json'
+    user_authorization_url = "https://accounts.google.com/o/oauth2/auth"
+    access_token_url = "https://accounts.google.com/o/oauth2/token"
+    user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo?alt=json"
 
-    user_info_scope = ['profile',
-                       'email']
+    user_info_scope = ["profile", "email"]
 
     supported_user_attributes = core.SupportedUserAttributes(
         id=False,
@@ -63,7 +62,6 @@ class Google(OAuth2):
         last_name=True,
         locale=True,
         picture=True,
-
         # No longer supported as of 2016-08
         link=False,
         gender=False,
@@ -74,16 +72,15 @@ class Google(OAuth2):
 
         # Handle special Google requirements to be able to refresh the access token.
         if self.offline:
-            if 'access_type' not in self.user_authorization_params:
+            if "access_type" not in self.user_authorization_params:
                 # Google needs access_type=offline param in the user authorization request.
-                self.user_authorization_params['access_type'] = 'offline'
-            if 'approval_prompt' not in self.user_authorization_params:
+                self.user_authorization_params["access_type"] = "offline"
+            if "approval_prompt" not in self.user_authorization_params:
                 # And also approval_prompt=force.
-                self.user_authorization_params['approval_prompt'] = 'force'
+                self.user_authorization_params["approval_prompt"] = "force"
 
     @classmethod
-    def _x_request_elements_filter(cls, request_type, request_elements,
-                                   credentials):
+    def _x_request_elements_filter(cls, request_type, request_elements, credentials):
         """
         Google doesn't accept client ID and secret to be at the same time in
         request parameters and in the basic authorization header in the
@@ -91,19 +88,19 @@ class Google(OAuth2):
         """
         if request_type is cls.ACCESS_TOKEN_REQUEST_TYPE:
             params = request_elements[2]
-            del params['client_id']
-            del params['client_secret']
+            del params["client_id"]
+            del params["client_secret"]
         return request_elements
 
     @staticmethod
     def _x_user_parser(user, data):
 
-        user.email = data.get('email')
-        user.name = data.get('name')
-        user.first_name = data.get('given_name', '')
-        user.last_name = data.get('family_name', '')
-        user.locale = data.get('locale', '')
-        user.picture = data.get('picture', '')
+        user.email = data.get("email")
+        user.name = data.get("name")
+        user.first_name = data.get("given_name", "")
+        user.last_name = data.get("family_name", "")
+        user.locale = data.get("locale", "")
+        user.picture = data.get("picture", "")
 
         # Special attribute if email has been verified
         user.email_verified = data.get("email_verified")
@@ -114,7 +111,7 @@ class Google(OAuth2):
         """
         Google has space-separated scopes
         """
-        return ' '.join(scope)
+        return " ".join(scope)
 
 
 # Needed for Authomatic magic

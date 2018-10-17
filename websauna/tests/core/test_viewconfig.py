@@ -9,13 +9,14 @@ def setup_wsgi():
     configurator = Configurator()
 
     configurator.include("pyramid_jinja2")
-    configurator.add_jinja2_renderer('.html')
-    configurator.add_jinja2_search_path('websauna.tests.core:templates/viewconfig', name='.html')
+    configurator.add_jinja2_renderer(".html")
+    configurator.add_jinja2_search_path("websauna.tests.core:templates/viewconfig", name=".html")
 
     configurator.add_route("parent_hello", "/parent_hello")
     configurator.add_route("child_hello", "/child_hello")
 
     from websauna.tests.viewconfig import testmodule
+
     configurator.set_root_factory(testmodule.Root)
     configurator.scan(testmodule)
 
@@ -28,10 +29,10 @@ def test_override_context():
     wsgi = setup_wsgi()
 
     resp = wsgi.get("/parent/edit", status=200)
-    assert resp.text == '200 OK\n\n\n\n\nEditing: parent\n\n'
+    assert resp.text == "200 OK\n\n\n\n\nEditing: parent\n\n"
 
     resp = wsgi.get("/child/edit", status=200)
-    assert resp.text == '200 OK\n\n\n\n\nEditing: child\n\n'
+    assert resp.text == "200 OK\n\n\n\n\nEditing: child\n\n"
 
 
 def test_child_own_view():
@@ -39,7 +40,7 @@ def test_child_own_view():
     wsgi = setup_wsgi()
 
     resp = wsgi.get("/child2/show", status=200)
-    assert resp.text == '200 OK\n\n\n\n\nShowing: child2\n\n'
+    assert resp.text == "200 OK\n\n\n\n\nShowing: child2\n\n"
 
 
 def test_grand_child_view():
@@ -47,7 +48,7 @@ def test_grand_child_view():
     wsgi = setup_wsgi()
 
     resp = wsgi.get("/grand_child/edit", status=200)
-    assert resp.text == '200 OK\n\n\n\n\nEditing: grand_child\n\n'
+    assert resp.text == "200 OK\n\n\n\n\nEditing: grand_child\n\n"
 
 
 def test_grand_grand_child_view():
@@ -55,7 +56,7 @@ def test_grand_grand_child_view():
     wsgi = setup_wsgi()
 
     resp = wsgi.get("/grand_grand_child/edit", status=200)
-    assert resp.text == '200 OK\n\n\n\n\nEditing: grand_grand_child\n\n'
+    assert resp.text == "200 OK\n\n\n\n\nEditing: grand_grand_child\n\n"
 
 
 def test_invalid_override():
@@ -70,7 +71,7 @@ def test_rendered_override():
     wsgi = setup_wsgi()
 
     resp = wsgi.get("/parent_hello", status=200)
-    assert resp.text.strip() == 'Hello Parent: ParentRouteView'
+    assert resp.text.strip() == "Hello Parent: ParentRouteView"
 
     resp = wsgi.get("/child_hello", status=200)
-    assert resp.text.strip() == 'Hello Child: ChildRouteView'
+    assert resp.text.strip() == "Hello Child: ChildRouteView"

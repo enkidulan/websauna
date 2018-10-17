@@ -19,6 +19,4 @@ compat.SafeConfigParser = IncludeAwareConfigParser
 
 
 def main():
-    sys.exit(
-        load_entry_point('alembic', 'console_scripts', 'alembic')()
-    )
+    sys.exit(load_entry_point("alembic", "console_scripts", "alembic")())

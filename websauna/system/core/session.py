@@ -39,7 +39,7 @@ def ignore_session(url: str) -> bool:
     :return: Flag indicating if session should be ignored.
     """
     path = urlparse(url).path
-    to_notebook = path.startswith('/notebook/')
+    to_notebook = path.startswith("/notebook/")
     ext = str(os.path.splitext(path)[1]).lower()
     return True if (ext in NO_SESSION_FILE_EXTENSIONS and not to_notebook) else False
 
@@ -73,7 +73,7 @@ class WebsaunaSession(RedisSession):
         self.managed_dict[key] = value
 
     def get_csrf_token(self):
-        token = self.get('_csrft_', None)
+        token = self.get("_csrft_", None)
         if token is None:
             token = self.new_csrf_token()
         else:
@@ -105,7 +105,8 @@ def _set_cookie(
         path=cookie_path,
         domain=cookie_domain,
         secure=cookie_secure,
-        httponly=cookie_httponly,)
+        httponly=cookie_httponly,
+    )
 
 
 def _cookie_callback(
@@ -164,28 +165,28 @@ def _cookie_callback(
 def WebsaunaSessionFactory(
     secret,
     timeout=1200,
-    cookie_name='session',
+    cookie_name="session",
     cookie_max_age=None,
-    cookie_path='/',
+    cookie_path="/",
     cookie_domain=None,
     cookie_secure=False,
     cookie_httponly=True,
     cookie_on_exception=True,
     url=None,
-    host='localhost',
+    host="localhost",
     port=6379,
     db=0,
     password=None,
     socket_timeout=None,
     connection_pool=None,
-    encoding='utf-8',
-    encoding_errors='strict',
+    encoding="utf-8",
+    encoding_errors="strict",
     unix_socket_path=None,
     client_callable=None,
     serialize=cPickle.dumps,
     deserialize=cPickle.loads,
     id_generator=_generate_session_id,
-    cookieless_headers=('expires', 'cache-control'),
+    cookieless_headers=("expires", "cache-control"),
     klass=WebsaunaSession,
 ):
     """
@@ -287,6 +288,7 @@ def WebsaunaSessionFactory(
       encoding_errors
       unix_socket_path
     """
+
     def factory(request, initial_data, new_session_id=get_unique_session_id):
         redis_options = dict(
             host=host,
@@ -301,23 +303,17 @@ def WebsaunaSessionFactory(
         )
 
         # an explicit client callable gets priority over the default
-        redis = client_callable(request, **redis_options) \
-            if client_callable is not None \
+        redis = (
+            client_callable(request, **redis_options)
+            if client_callable is not None
             else get_default_connection(request, url=url, **redis_options)
-
-        # attempt to retrieve a session_id from the cookie
-        session_id_from_cookie = _get_session_id_from_cookie(
-            request=request,
-            cookie_name=cookie_name,
-            secret=secret,
         )
 
+        # attempt to retrieve a session_id from the cookie
+        session_id_from_cookie = _get_session_id_from_cookie(request=request, cookie_name=cookie_name, secret=secret)
+
         new_session = functools.partial(
-            new_session_id,
-            redis=redis,
-            timeout=timeout,
-            serialize=serialize,
-            generator=id_generator,
+            new_session_id, redis=redis, timeout=timeout, serialize=serialize, generator=id_generator
         )
 
         if session_id_from_cookie and redis.exists(session_id_from_cookie):
@@ -349,10 +345,7 @@ def WebsaunaSessionFactory(
             secret=secret,
         )
         delete_cookie = functools.partial(
-            _delete_cookie,
-            cookie_name=cookie_name,
-            cookie_path=cookie_path,
-            cookie_domain=cookie_domain,
+            _delete_cookie, cookie_name=cookie_name, cookie_path=cookie_path, cookie_domain=cookie_domain
         )
         cookie_callback = functools.partial(
             _cookie_callback,
@@ -378,8 +371,8 @@ def set_creation_time_aware_session_factory(config):
     settings = config.registry.settings
 
     # special rule for converting dotted python paths to callables
-    for option in ('client_callable', 'serialize', 'deserialize', 'id_generator'):
-        key = 'redis.sessions.{option}'.format(option=option)
+    for option in ("client_callable", "serialize", "deserialize", "id_generator"):
+        key = "redis.sessions.{option}".format(option=option)
         if key in settings:
             settings[key] = config.maybe_dotted(settings[key])
 
@@ -394,10 +387,7 @@ def set_creation_time_aware_session_factory(config):
         """
         # Pass in the the data we use to track session on the server side.
         # Esp. created_at is used to later manually purge old sessions
-        initial_data = {
-            "client_addr": request.client_addr,
-            "created_at": now(),
-        }
+        initial_data = {"client_addr": request.client_addr, "created_at": now()}
 
         # Make sure we do not get accidental race conditions when populating sessions when browser asynchronously fetches more resources
         url = request.url

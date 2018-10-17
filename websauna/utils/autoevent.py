@@ -94,7 +94,7 @@ def fire_advisor_event(source: object, event_source_name: str, role: AdvisorRole
             advisor(*args, **kwargs)
 
 
-def event_source(method: t.Callable, name: t.Optional[str]=None):
+def event_source(method: t.Callable, name: t.Optional[str] = None):
     """A decorator which makes the function act as a source of before and after call events.
 
     You can later subscribe to these event with :py:func:`before` and :py:func`after` decorators.
@@ -134,11 +134,15 @@ def after(target_event_source: t.Callable):
     def _outer(advisor_method):
 
         wrapped = getattr(target_event_source, "__wrapped__", None)
-        assert wrapped, "The target function {} was not decorated with @event_source decorator or any other decorator".format(target_event_source)
+        assert (
+            wrapped
+        ), "The target function {} was not decorated with @event_source decorator or any other decorator".format(
+            target_event_source
+        )
 
         name = wrapped._event_source_name
 
-        _advisor_methods[advisor_method].append((AdvisorRole.after, name,))
+        _advisor_methods[advisor_method].append((AdvisorRole.after, name))
         return advisor_method
 
     return _outer
@@ -153,11 +157,15 @@ def before(target_event_source: t.Callable):
     def _outer(advisor_method):
 
         wrapped = getattr(target_event_source, "__wrapped__", None)
-        assert wrapped, "The target function {} was not decorated with @event_source decorator or any other decorator".format(target_event_source)
+        assert (
+            wrapped
+        ), "The target function {} was not decorated with @event_source decorator or any other decorator".format(
+            target_event_source
+        )
 
         name = wrapped._event_source_name
 
-        _advisor_methods[advisor_method].append((AdvisorRole.before, name,))
+        _advisor_methods[advisor_method].append((AdvisorRole.before, name))
         return advisor_method
 
     return _outer

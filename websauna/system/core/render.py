@@ -22,13 +22,10 @@ class OnDemandResourceRenderer:
     """
 
     def __init__(self):
-        self.resources = {
-            "js": OrderedSet(),
-            "css": OrderedSet(),
-        }
+        self.resources = {"js": OrderedSet(), "css": OrderedSet()}
         self.js_requires_head = False
 
-    def request_resource(self, kind: str, resource_url: str, js_requires_head: bool=False):
+    def request_resource(self, kind: str, resource_url: str, js_requires_head: bool = False):
         """A widget or something wants to place a CSS or JS file on the page rendering.
 
         :param kind: "js" or "css"

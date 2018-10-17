@@ -18,14 +18,10 @@ def merge_url_qs(url: str, **kw) -> str:
     :return: An URL with keyword arguments merged into the query string.
     """
     segments = urlsplit(url)
-    extra_qs = [
-        (k, v)
-        for (k, v) in parse_qsl(segments.query, keep_blank_values=1)
-        if k not in kw
-    ]
+    extra_qs = [(k, v) for (k, v) in parse_qsl(segments.query, keep_blank_values=1) if k not in kw]
     qs = urlencode(sorted(kw.items()))
     if extra_qs:
-        qs += '&' + urlencode(extra_qs)
+        qs += "&" + urlencode(extra_qs)
     return urlunsplit((segments.scheme, segments.netloc, segments.path, qs, segments.fragment))
 
 
@@ -151,35 +147,35 @@ class Batch:
       The item number that ends this batch (indexed from zero).
 
     """
-    def __init__(self, seq, request, url=None, default_size=10, toggle_size=40,
-                 seqlen=None):
+
+    def __init__(self, seq, request, url=None, default_size=10, toggle_size=40, seqlen=None):
         if url is None:
             url = request.url
 
         try:
-            num = int(request.params.get('batch_num', 0))
+            num = int(request.params.get("batch_num", 0))
         except (TypeError, ValueError):
             num = 0
         if num < 0:
             num = 0
 
         try:
-            size = int(request.params.get('batch_size', default_size))
+            size = int(request.params.get("batch_size", default_size))
         except (TypeError, ValueError):
             size = default_size
         if size < 1:
             size = default_size
 
-        multicolumn = request.params.get('multicolumn', '') == 'True'
+        multicolumn = request.params.get("multicolumn", "") == "True"
 
         # create multicolumn/single column toggle attributes
         if multicolumn:
             toggle_num = size * num / default_size
             toggle_size = default_size
-            toggle_text = 'Single column'
+            toggle_text = "Single column"
         else:
             toggle_num = size * num / toggle_size
-            toggle_text = 'Multi-column'
+            toggle_text = "Multi-column"
 
         if seqlen is None:
             # won't work if seq is a generator
@@ -211,12 +207,7 @@ class Batch:
             last_url = merge_url_qs(url, batch_size=size, batch_num=last)
 
         if prev_url or next_url:
-            toggle_url = merge_url_qs(
-                url,
-                batch_size=toggle_size,
-                batch_num=toggle_num,
-                multicolumn=not multicolumn,
-            )
+            toggle_url = merge_url_qs(url, batch_size=toggle_size, batch_num=toggle_num, multicolumn=not multicolumn)
 
         self.startitem = start
         self.enditem = end - 1
@@ -260,11 +251,11 @@ class Batch:
 class DefaultPaginator:
     """Default pagination implementation for CRUD, having 20 items per page."""
 
-    template = 'crud/paginator.html'
+    template = "crud/paginator.html"
 
     default_size = 20
 
-    def __init__(self, template: t.Optional[str]=None, default_size: t.Optional[int]=None):
+    def __init__(self, template: t.Optional[str] = None, default_size: t.Optional[int] = None):
         """Initialize DefaultPaginator.
 
         :param template: Path to paginator template.

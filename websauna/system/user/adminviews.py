@@ -51,7 +51,7 @@ def kill_user_sessions(request: Request, user: IUser, operation: str):
     request.registry.notify(e, request)
 
 
-@panel_config(name='admin_panel', context=UserAdmin, renderer='admin/user_panel.html')
+@panel_config(name="admin_panel", context=UserAdmin, renderer="admin/user_panel.html")
 def user_admin_panel(context: UserAdmin, request: Request, **kwargs) -> dict:
     """Admin panel for Users.
 
@@ -76,14 +76,15 @@ def user_admin_panel(context: UserAdmin, request: Request, **kwargs) -> dict:
 
 class UserListing(admin_views.Listing):
     """Listing view for Users."""
+
     title = "All users"
 
     table = listing.Table(
         columns=[
-            listing.Column("id", "Id",),
+            listing.Column("id", "Id"),
             listing.Column("friendly_name", "Friendly name"),
             listing.Column("email", "Email"),
-            listing.ControlsColumn()
+            listing.ControlsColumn(),
         ]
     )
 
@@ -100,7 +101,9 @@ class UserListing(admin_views.Listing):
         """
         return query.order_by(self.get_model().created_at.desc())
 
-    @view_config(context=UserAdmin, route_name="admin", name="listing", renderer="crud/listing.html", permission='view')
+    @view_config(
+        context=UserAdmin, route_name="admin", name="listing", renderer="crud/listing.html", permission="view"
+    )
     def listing(self) -> dict:
         """User listing view.
 
@@ -154,7 +157,9 @@ class UserCSVListing(CSVListing):
 class UserShow(admin_views.Show):
     """Show one user."""
 
-    resource_buttons = admin_views.Show.resource_buttons + [TraverseLinkButton(id="set-password", name="Set password", view_name="set-password")]
+    resource_buttons = admin_views.Show.resource_buttons + [
+        TraverseLinkButton(id="set-password", name="Set password", view_name="set-password")
+    ]
 
     includes = [
         "id",
@@ -163,13 +168,19 @@ class UserShow(admin_views.Show):
         "created_at",
         "updated_at",
         "username",
-        colander.SchemaNode(colander.String(), name='full_name'),
+        colander.SchemaNode(colander.String(), name="full_name"),
         "email",
         "last_login_at",
         "last_login_ip",
         colander.SchemaNode(colander.String(), name="registration_source", missing=colander.drop),
-        colander.SchemaNode(JSONValue(), name="user_data", widget=JSONWidget(), description="user_data JSON properties"),
-        colander.SchemaNode(GroupSet(), name="groups", widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"))
+        colander.SchemaNode(
+            JSONValue(), name="user_data", widget=JSONWidget(), description="user_data JSON properties"
+        ),
+        colander.SchemaNode(
+            GroupSet(),
+            name="groups",
+            widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"),
+        ),
     ]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
@@ -180,12 +191,11 @@ class UserShow(admin_views.Show):
         :return: Title for the User object.
         """
         user = self.get_object()
-        return "{friendly_name} #{id}".format(
-            friendly_name=user.friendly_name,
-            id=self.get_object().id
-        )
+        return "{friendly_name} #{id}".format(friendly_name=user.friendly_name, id=self.get_object().id)
 
-    @view_config(context=UserAdmin.Resource, route_name="admin", name="show", renderer="crud/show.html", permission='view')
+    @view_config(
+        context=UserAdmin.Resource, route_name="admin", name="show", renderer="crud/show.html", permission="view"
+    )
     def show(self):
         """User show view.
 
@@ -199,10 +209,14 @@ class UserEdit(admin_views.Edit):
 
     includes = [
         "enabled",
-        colander.SchemaNode(colander.String(), name='username'),  # Make username required field
-        colander.SchemaNode(colander.String(), name='full_name', missing=""),
+        colander.SchemaNode(colander.String(), name="username"),  # Make username required field
+        colander.SchemaNode(colander.String(), name="full_name", missing=""),
         "email",
-        colander.SchemaNode(GroupSet(), name="groups", widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"))
+        colander.SchemaNode(
+            GroupSet(),
+            name="groups",
+            widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"),
+        ),
     ]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
@@ -234,12 +248,11 @@ class UserEdit(admin_views.Edit):
         :return: Title for the User object.
         """
         user = self.get_object()
-        return "{friendly_name} #{id}".format(
-            friendly_name=user.friendly_name,
-            id=self.get_object().id
-        )
+        return "{friendly_name} #{id}".format(friendly_name=user.friendly_name, id=self.get_object().id)
 
-    @view_config(context=UserAdmin.Resource, route_name="admin", name="edit", renderer="crud/edit.html", permission='edit')
+    @view_config(
+        context=UserAdmin.Resource, route_name="admin", name="edit", renderer="crud/edit.html", permission="edit"
+    )
     def edit(self):
         """User edit view.
 
@@ -251,14 +264,21 @@ class UserEdit(admin_views.Edit):
 @view_overrides(context=UserAdmin)
 class UserAdd(admin_views.Add):
     """CRUD for creating new users."""
+
     #: TODO: Not sure how we should manage with explicit username - it's not used for login so no need to have a point to ask
 
     includes = [
         # "username", --- usernames are never exposed anymore
         colander.SchemaNode(colander.String(), name="email", validator=validate_unique_user_email),
         "full_name",
-        colander.SchemaNode(colander.String(), name='password', widget=deform.widget.CheckedPasswordWidget(css_class="password-widget")),
-        colander.SchemaNode(GroupSet(), name="groups", widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"))
+        colander.SchemaNode(
+            colander.String(), name="password", widget=deform.widget.CheckedPasswordWidget(css_class="password-widget")
+        ),
+        colander.SchemaNode(
+            GroupSet(),
+            name="groups",
+            widget=defer_widget_values(deform.widget.CheckboxChoiceWidget, group_vocabulary, css_class="groups"),
+        ),
     ]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
@@ -269,7 +289,7 @@ class UserAdd(admin_views.Add):
         :return: Form object.
         """
         # TODO: Still not sure how handle nested values on the automatically generated add form. But here we need it for groups to appear
-        return self.create_form(EditMode.add, buttons=("add", "cancel",))
+        return self.create_form(EditMode.add, buttons=("add", "cancel"))
 
     def initialize_object(self, form: deform.Form, appstruct: dict, obj: User):
         """Initialize User object.
@@ -294,7 +314,9 @@ class UserSetPassword(admin_views.Edit):
     """
 
     includes = [
-        colander.SchemaNode(colander.String(), name='password', widget=deform.widget.CheckedPasswordWidget(css_class="password-widget")),
+        colander.SchemaNode(
+            colander.String(), name="password", widget=deform.widget.CheckedPasswordWidget(css_class="password-widget")
+        )
     ]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
@@ -322,7 +344,13 @@ class UserSetPassword(admin_views.Edit):
         # Redirect back to view page after edit page has succeeded
         return HTTPFound(self.request.resource_url(self.context, "show"))
 
-    @view_config(context=UserAdmin.Resource, route_name="admin", name="set-password", renderer="crud/edit.html", permission='edit')
+    @view_config(
+        context=UserAdmin.Resource,
+        route_name="admin",
+        name="set-password",
+        renderer="crud/edit.html",
+        permission="edit",
+    )
     def set_password(self):
         """User set password view.
 
@@ -337,6 +365,7 @@ class UserDelete(admin_views.Delete):
 
     Drop user sessions on invocation.
     """
+
     def deleter(self, context: Resource, request: Request):
         """Execute user deletion.
 
@@ -356,10 +385,10 @@ class GroupListing(admin_views.Listing):
 
     table = listing.Table(
         columns=[
-            listing.Column("id", "Id",),
+            listing.Column("id", "Id"),
             listing.Column("name", "Name"),
             listing.Column("description", "Description"),
-            listing.ControlsColumn()
+            listing.ControlsColumn(),
         ]
     )
 
@@ -375,17 +404,13 @@ class GroupListing(admin_views.Listing):
 class GroupShow(admin_views.Show):
     """Display one Group."""
 
-    includes = [
-        "id",
-        "name",
-        "description",
-        "created_at",
-        "updated_at"
-    ]
+    includes = ["id", "name", "description", "created_at", "updated_at"]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
 
-    @view_config(context=GroupAdmin.Resource, route_name="admin", name="show", renderer="crud/show.html", permission='view')
+    @view_config(
+        context=GroupAdmin.Resource, route_name="admin", name="show", renderer="crud/show.html", permission="view"
+    )
     def show(self):
         """Group show view..
 
@@ -397,14 +422,11 @@ class GroupShow(admin_views.Show):
 class GroupAdd(admin_views.Add):
     """Create new Group."""
 
-    includes = [
-        "name",
-        "description"
-    ]
+    includes = ["name", "description"]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
 
-    @view_config(context=GroupAdmin, route_name="admin", name="add", renderer="crud/add.html", permission='add')
+    @view_config(context=GroupAdmin, route_name="admin", name="add", renderer="crud/add.html", permission="add")
     def add(self):
         """Group add view..
 
@@ -416,14 +438,13 @@ class GroupAdd(admin_views.Add):
 class GroupEdit(admin_views.Edit):
     """Edit one group in admin interface."""
 
-    includes = [
-        "name",
-        "description"
-    ]
+    includes = ["name", "description"]
 
     form_generator = SQLAlchemyFormGenerator(includes=includes)
 
-    @view_config(context=GroupAdmin.Resource, route_name="admin", name="edit", renderer="crud/edit.html", permission='edit')
+    @view_config(
+        context=GroupAdmin.Resource, route_name="admin", name="edit", renderer="crud/edit.html", permission="edit"
+    )
     def edit(self):
         """Group edit view..
 

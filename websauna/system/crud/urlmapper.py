@@ -62,8 +62,7 @@ class IdMapper(Mapper):
         if not hasattr(obj, self.mapping_attribute):
             raise CannotMapException(
                 "Could not find attribute {attr} on object {obj}. The default behavior is to look for attribute/column uuid. If you need to change this behavior define mapper in your CRUD class.".format(
-                    attr=self.mapping_attribute,
-                    obj=obj
+                    attr=self.mapping_attribute, obj=obj
                 )
             )
 

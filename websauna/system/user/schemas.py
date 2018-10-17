@@ -48,7 +48,9 @@ def group_vocabulary(node: c.SchemaNode, kw: dict) -> t.List[t.Tuple[str, str]]:
     def first_column_getter(group: Group):
         return uuid_to_slug(group.uuid)
 
-    return convert_query_to_tuples(request.dbsession.query(Group).all(), first_column=first_column_getter, second_column="name")
+    return convert_query_to_tuples(
+        request.dbsession.query(Group).all(), first_column=first_column_getter, second_column="name"
+    )
 
 
 def optional_group_vocabulary(node: c.SchemaNode, kw: dict) -> t.List[t.Tuple[str, str]]:
@@ -86,7 +88,7 @@ def email_exists(node: c.SchemaNode, value: str):
     :param value: Email address.
     :raises: c.Invalid if email is not registered for an User.
     """
-    request = node.bindings['request']
+    request = node.bindings["request"]
     User = get_user_class(request.registry)
     exists = request.dbsession.query(User).filter(User.email.ilike(value)).one_or_none()
     if not exists:
@@ -113,14 +115,13 @@ class RegisterSchema(CSRFSchema):
 
     email = c.SchemaNode(
         c.String(),
-        title='Email',
+        title="Email",
         validator=c.All(c.Email(), validate_unique_user_email),
-        widget=w.TextInputWidget(size=40, maxlength=260, type='email'))
+        widget=w.TextInputWidget(size=40, maxlength=260, type="email"),
+    )
 
     password = c.SchemaNode(
-        c.String(),
-        validator=c.Length(min=PASSWORD_MIN_LENGTH),
-        widget=deform.widget.CheckedPasswordWidget(),
+        c.String(), validator=c.Length(min=PASSWORD_MIN_LENGTH), widget=deform.widget.CheckedPasswordWidget()
     )
 
 
@@ -130,7 +131,12 @@ class LoginSchema(CSRFSchema):
     The user can log in both with email and his/her username, though we recommend using emails as users tend to forget their usernames.
     """
 
-    username = c.SchemaNode(c.String(), title='Email', validator=c.All(c.Email()), widget=w.TextInputWidget(size=40, maxlength=260, type='email'))
+    username = c.SchemaNode(
+        c.String(),
+        title="Email",
+        validator=c.All(c.Email()),
+        widget=w.TextInputWidget(size=40, maxlength=260, type="email"),
+    )
 
     password = c.SchemaNode(c.String(), widget=deform.widget.PasswordWidget())
 
@@ -139,15 +145,10 @@ class ResetPasswordSchema(CSRFSchema):
     """Reset password schema."""
 
     user = c.SchemaNode(
-        c.String(),
-        missing=c.null,
-        widget=deform.widget.TextInputWidget(template='readonly/textinput'))
-
-    password = c.SchemaNode(
-        c.String(),
-        validator=c.Length(min=2),
-        widget=deform.widget.CheckedPasswordWidget()
+        c.String(), missing=c.null, widget=deform.widget.TextInputWidget(template="readonly/textinput")
     )
+
+    password = c.SchemaNode(c.String(), validator=c.Length(min=2), widget=deform.widget.CheckedPasswordWidget())
 
 
 def validate_user_exists_with_email(node: c.SchemaNode, value: str):
@@ -157,7 +158,7 @@ def validate_user_exists_with_email(node: c.SchemaNode, value: str):
     :param value: Email address.
     :raises: c.Invalid if email is not registered for an User.
     """
-    request = node.bindings['request']
+    request = node.bindings["request"]
 
     user_registry = get_user_registry(request)
     user = user_registry.get_by_email(value)
@@ -171,7 +172,8 @@ class ForgotPasswordSchema(CSRFSchema):
 
     email = c.SchemaNode(
         c.Str(),
-        title='Email',
+        title="Email",
         validator=c.All(c.Email(), validate_user_exists_with_email),
-        widget=w.TextInputWidget(size=40, maxlength=260, type='email', template="textinput_placeholder"),
-        description="The email address under which you have your account. Example: joe@example.com")
+        widget=w.TextInputWidget(size=40, maxlength=260, type="email", template="textinput_placeholder"),
+        description="The email address under which you have your account. Example: joe@example.com",
+    )

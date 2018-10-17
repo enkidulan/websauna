@@ -37,7 +37,16 @@ class Request(_Request):
 
     """
 
-    def __type_hinting__(self, user: User, dbsession: Session, session: ISession, admin: Admin, registry: Registry, on_demand_resource_renderer: OnDemandResourceRenderer, transaction_manager: TransactionManager):
+    def __type_hinting__(
+        self,
+        user: User,
+        dbsession: Session,
+        session: ISession,
+        admin: Admin,
+        registry: Registry,
+        on_demand_resource_renderer: OnDemandResourceRenderer,
+        transaction_manager: TransactionManager,
+    ):
         """A dummy helper function to tell IDEs about reify'ed variables.
 
         :param user: The logged in user. None if the visitor is anonymous.

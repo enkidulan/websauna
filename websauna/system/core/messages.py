@@ -6,22 +6,22 @@ class FlashMessage(object):
     """Internal storage format of flash message."""
 
     # High traffic sites might have plenty of these objects, so optimize memory usage here a bit
-    __slots__ = ('kind', 'plain', 'rich', 'msg_id', 'extra')
+    __slots__ = ("kind", "plain", "rich", "msg_id", "extra")
 
-    KINDS = set(['error', 'warning', 'info', 'success'])
+    KINDS = set(["error", "warning", "info", "success"])
 
     def __getstate__(self):
-        '''Because we are using __slots__, pickling needs this method.'''
-        return {'kind': self.kind, 'plain': self.plain, 'rich': self.rich, 'msg_id': self.msg_id, 'extra': self.extra}
+        """Because we are using __slots__, pickling needs this method."""
+        return {"kind": self.kind, "plain": self.plain, "rich": self.rich, "msg_id": self.msg_id, "extra": self.extra}
 
     def __setstate__(self, state):
-        self.kind = state.get('kind')
-        self.plain = state.get('plain')
-        self.rich = state.get('rich')
-        self.msg_id = state.get('msg_id')
-        self.extra = state.get('extra')
+        self.kind = state.get("kind")
+        self.plain = state.get("plain")
+        self.rich = state.get("rich")
+        self.msg_id = state.get("msg_id")
+        self.extra = state.get("extra")
 
-    def __init__(self, plain=None, rich=None, kind='warning', msg_id=None, extra=None):
+    def __init__(self, plain=None, rich=None, kind="warning", msg_id=None, extra=None):
         """
 
         :param plain: Message as plain text
@@ -31,8 +31,7 @@ class FlashMessage(object):
         :param extra: Extra payload (not used by the default renderer)
         """
         assert (plain and not rich) or (rich and not plain)
-        assert kind in self.KINDS, "Unknown kind of alert: \"{}\". " \
-            "Possible kinds are {}".format(kind, self.KINDS)
+        assert kind in self.KINDS, 'Unknown kind of alert: "{}". ' "Possible kinds are {}".format(kind, self.KINDS)
 
         self.kind = kind
         self.rich = rich
@@ -48,7 +47,7 @@ class FlashMessage(object):
 
     def get_id(self):
         """Allows session storage to know if this message has been already added."""
-        return any((self.msg_id, self.rich, self.plain,))
+        return any((self.msg_id, self.rich, self.plain))
 
     # http://stackoverflow.com/a/4901847/315168
 
@@ -61,10 +60,18 @@ class FlashMessage(object):
     def __ne__(self, other):
         # Not strictly necessary, but to avoid having both x==y and x!=y
         # True at the same time
-        return not(self == other)
+        return not (self == other)
 
 
-def add(request: Request, msg: str, kind: str="info", msg_id: str=None, extra: dict=None, html=False, allow_duplicates=False):
+def add(
+    request: Request,
+    msg: str,
+    kind: str = "info",
+    msg_id: str = None,
+    extra: dict = None,
+    html=False,
+    allow_duplicates=False,
+):
     """Add a message which is shown to the user on the next page load.
 
     This is so called Flash message. The message is stored in the session. On the next page load, the HTML templates and framework must read all pending messages from the session store and display them to the user. Usually this is a notification rendered at the top of the page.

@@ -30,27 +30,30 @@ from websauna.system.devop.cmdline import setup_logging  # noQA
 from websauna.system.http.utils import make_routable_request
 from websauna.system.model.meta import create_dbsession
 from websauna.tests.test_utils import make_dummy_request  # noQA
+
 #: Make sure py.test picks this up
 from websauna.tests.webserver import customized_web_server  # noQA
 from websauna.tests.webserver import web_server  # noQA
 from websauna.utils.qualname import get_qual_name
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def test_config_path(request) -> str:
     """A py.test fixture to get test INI configuration file path from py.test command line.
 
     :return: Absolute path to test.ini file
     """
 
-    assert getattr(request.config.option, "ini", None), "You need to give --ini test.ini command line option to py.test to find our test settings"
+    assert getattr(
+        request.config.option, "ini", None
+    ), "You need to give --ini test.ini command line option to py.test to find our test settings"
 
     config_uri = os.path.abspath(request.config.option.ini)
 
     return config_uri
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def ini_settings(request, test_config_path) -> dict:
     """Load INI settings for test run from py.test command line.
 
@@ -64,12 +67,12 @@ def ini_settings(request, test_config_path) -> dict:
 
     # Setup Python logging from the INI
     # Add Websauna loader
-    if not test_config_path.startswith('ws://'):
-        test_config_path = 'ws://{0}'.format(test_config_path)
+    if not test_config_path.startswith("ws://"):
+        test_config_path = "ws://{0}".format(test_config_path)
 
     loader = plaster.get_loader(test_config_path)
     # Read [app] section
-    settings = loader.get_settings('app:main')
+    settings = loader.get_settings("app:main")
 
     # To pass the config filename itself forward
     settings["_ini_file"] = test_config_path
@@ -77,7 +80,7 @@ def ini_settings(request, test_config_path) -> dict:
     return settings
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def paster_config(request, test_config_path, ini_settings) -> tuple:
     """A fixture to get global config and app settings for Paster-like passing.
 
@@ -137,7 +140,7 @@ def get_app(ini_settings: dict, extra_init: t.Optional[t.Callable] = None) -> Ro
     return data["app"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def app(request, ini_settings: dict, **settings_overrides) -> Router:
     """Initialize WSGI application from INI file given on the command line.
 
@@ -152,14 +155,14 @@ def app(request, ini_settings: dict, **settings_overrides) -> Router:
     return data["app"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def init(request, app):
     """Access to the default :py:class:`websauna.system.Initializer` instance created from ``test.ini``.
     """
     return app.initializer
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def registry(request, app) -> Registry:
     """Get access to registry.
 

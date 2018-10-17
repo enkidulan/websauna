@@ -85,7 +85,7 @@ def _check(redis, key, window=60, limit=50):
 
     # Expire old keys (hits)
     expires = time.time() - window
-    redis.zremrangebyscore(key, '-inf', expires)
+    redis.zremrangebyscore(key, "-inf", expires)
 
     # Add a hit on the very moment
     now = time.time()

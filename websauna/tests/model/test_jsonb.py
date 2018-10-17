@@ -40,18 +40,16 @@ def test_committed_jsonb_dict_new_key(dbsession, registry):
         assert u.user_data.get("phone_number") == "xxx"
 
 
-test_data = (('xxx', 1), ('yyy', 0))
+test_data = (("xxx", 1), ("yyy", 0))
 
 
-@pytest.mark.parametrize('query_param,expected_lines', test_data)
+@pytest.mark.parametrize("query_param,expected_lines", test_data)
 def test_query_jsonb_data(dbsession, registry, query_param, expected_lines):
     """Query JSONB field by one of its keys."""
     with transaction.manager:
         u = create_user(dbsession, registry)
         assert isinstance(u.user_data, NestedMutationDict)
-        u.user_data['phone_number'] = 'xxx'
+        u.user_data["phone_number"] = "xxx"
 
-    users = dbsession.query(User).filter(
-        User.user_data['phone_number'].astext == query_param
-    ).all()
+    users = dbsession.query(User).filter(User.user_data["phone_number"].astext == query_param).all()
     assert len(users) == expected_lines

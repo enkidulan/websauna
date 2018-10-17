@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 @implementer(IOAuthLoginService)
 class DefaultOAuthLoginService:
-
     def __init__(self, request: Request):
         self.request = request
 
@@ -74,7 +73,9 @@ class AuthomaticLoginHandler:
         self.social_logins = aslist(settings.get("websauna.social_logins", ""))
 
         # Allow only logins which we configured
-        assert provider_name in self.social_logins, "Attempt to login non-configured social media {}".format(provider_name)
+        assert provider_name in self.social_logins, "Attempt to login non-configured social media {}".format(
+            provider_name
+        )
 
         self.mapper = get_social_login_mapper(request.registry, provider_name)
         assert self.mapper, "No social media login mapper configured for {}".format(provider_name)
@@ -138,7 +139,7 @@ class AuthomaticLoginHandler:
     def handle(self) -> Response:
 
         # Login is always state changing operation
-        if self.request.method != 'POST' and not self.request.params:
+        if self.request.method != "POST" and not self.request.params:
             self.do_bad_request()
 
         # We will need the response to pass it to the WebObAdapter.
@@ -150,6 +151,7 @@ class AuthomaticLoginHandler:
         # Start the login procedure.
         class InternalPOSTWebObAdapter(WebObAdapter):
             """Having CSRF token in form data messes Authomatic internally so we strip it away with this hack.."""
+
             @property
             def params(self):
                 return dict()

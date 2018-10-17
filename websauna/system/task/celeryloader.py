@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 #: Passed through Celery loader mechanism
-ini_file = ''
+ini_file = ""
 
 
 def usage_message(argv: t.List[str]):
@@ -36,10 +36,9 @@ def usage_message(argv: t.List[str]):
     :raises sys.SystemExit:
     """
     cmd = os.path.basename(argv[0])
-    msg = (
-        'usage: {cmd} <config_uri> -- worker\n'
-        '(example: "{cmd} ws://conf/production.ini -- worker")'
-    ).format(cmd=cmd)
+    msg = ("usage: {cmd} <config_uri> -- worker\n" '(example: "{cmd} ws://conf/production.ini -- worker")').format(
+        cmd=cmd
+    )
     feedback_and_exit(msg, status_code=1, display_border=False)
 
 
@@ -56,13 +55,13 @@ class WebsaunaLoader(BaseLoader):
         :return: Celery configuration, as a string.
         """
         value = None
-        secrets_file = settings.get('websauna.secrets_file')
+        secrets_file = settings.get("websauna.secrets_file")
         if secrets_file:
             secrets = read_ini_secrets(secrets_file)
-            value = secrets.get('app:main.websauna.celery_config', '')
-        value = value or settings.get('websauna.celery_config')
+            value = secrets.get("app:main.websauna.celery_config", "")
+        value = value or settings.get("websauna.celery_config")
         if not value:
-            raise RuntimeError('No Celery configuration found in settings')
+            raise RuntimeError("No Celery configuration found in settings")
         return value
 
     def read_configuration(self, **kwargs) -> dict:
@@ -73,7 +72,7 @@ class WebsaunaLoader(BaseLoader):
         This way we avoid circular dependencies during Celery worker start up.
         """
         loader = plaster.get_loader(ini_file)  # global
-        settings = loader.get_settings('app:main')
+        settings = loader.get_settings("app:main")
 
         try:
             value = self.get_celery_config(settings)
@@ -84,7 +83,7 @@ class WebsaunaLoader(BaseLoader):
         return config
 
     def import_task_module(self, module):
-        raise RuntimeError('Import Celery config directive is not supported. Use config.scan() to pick up tasks.')
+        raise RuntimeError("Import Celery config directive is not supported. Use config.scan() to pick up tasks.")
 
     def register_tasks(self):
         """Inform Celery of all tasks registered through our Venusian-compatible task decorator."""
@@ -131,10 +130,12 @@ class WebsaunaLoader(BaseLoader):
 
         # We must not have on-going transaction when worker spawns a task
         # - otherwise it means init code has left transaction open
-        ensure_transactionless("Thread local TX was ongoing when Celery fired up a new task {}: {}".format(task_id, task))
+        ensure_transactionless(
+            "Thread local TX was ongoing when Celery fired up a new task {}: {}".format(task_id, task)
+        )
 
         # When using celery groups, the request is not available, we set it here.
-        if not hasattr(self, 'request'):
+        if not hasattr(self, "request"):
             self._set_request()
 
         # Each tasks gets a new request with its own transaction manager and dbsession
@@ -149,7 +150,7 @@ def fix_celery_logging(loglevel, logfile, format, colorize, **kwargs):
     setup_logging(ini_file)
 
 
-def main(argv: t.List[str]=sys.argv):
+def main(argv: t.List[str] = sys.argv):
     """Celery process entry point.
 
     Wrap celery command line script with our INI reader.
@@ -182,4 +183,5 @@ def main(argv: t.List[str]=sys.argv):
     argv = ["celery"] + celery_args
     # Directly jump to Celery 4.0+ entry point
     from celery.bin.celery import main
+
     main(argv)

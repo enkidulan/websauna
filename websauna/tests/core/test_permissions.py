@@ -18,10 +18,9 @@ from . import permissionsamples
 
 @pytest.fixture(scope="module")
 def permission_app(request, paster_config):
-    '''Custom WSGI app with permission test views enabled.'''
+    """Custom WSGI app with permission test views enabled."""
 
     class Initializer(websauna.system.DemoInitializer):
-
         def configure_views(self):
             super(Initializer, self).configure_views()
             self.config.scan(permissionsamples)

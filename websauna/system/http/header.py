@@ -8,8 +8,10 @@ def add_vary_callback_if_cookie(*varies):
     Prevent downstream web serves to accidentally cache session set-cookie reponses,
     potentially resulting to session leakage.
     """
+
     def inner(request, response):
         vary = set(response.vary if response.vary is not None else [])
         vary |= set(varies)
         response.vary = vary
+
     return inner

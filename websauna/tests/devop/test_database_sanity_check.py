@@ -20,6 +20,7 @@ def setup_module(self):
     # Quiet log output for the tests
     import logging
     from websauna.system.model.sanitycheck import logger
+
     logger.setLevel(logging.FATAL)
 
 
@@ -66,7 +67,7 @@ def gen_declarative():
 
         @declared_attr
         def _password(self):
-            return Column('password', String(256), nullable=False)
+            return Column("password", String(256), nullable=False)
 
         @hybrid_property
         def password(self):
@@ -78,7 +79,7 @@ def gen_declarative():
 def test_sanity_pass(ini_settings, dbsession):
     """See database sanity check completes when tables and columns are created."""
 
-    engine = engine_from_config(ini_settings, 'sqlalchemy.')
+    engine = engine_from_config(ini_settings, "sqlalchemy.")
     conn = engine.connect()
     conn.begin()
     Base, SaneTestModel = gen_test_model()
@@ -100,7 +101,7 @@ def test_sanity_pass(ini_settings, dbsession):
 def test_sanity_table_missing(ini_settings, dbsession):
     """See check fails when there is a missing table"""
 
-    engine = engine_from_config(ini_settings, 'sqlalchemy.')
+    engine = engine_from_config(ini_settings, "sqlalchemy.")
     conn = engine.connect()
     conn.begin()
 
@@ -119,7 +120,7 @@ def test_sanity_table_missing(ini_settings, dbsession):
 def test_sanity_column_missing(ini_settings, dbsession):
     """See check fails when there is a missing table"""
 
-    engine = engine_from_config(ini_settings, 'sqlalchemy.')
+    engine = engine_from_config(ini_settings, "sqlalchemy.")
     conn = engine.connect()
     conn.begin()
 
@@ -141,7 +142,7 @@ def test_sanity_column_missing(ini_settings, dbsession):
 def test_sanity_pass_relationship(ini_settings, dbsession):
     """See database sanity check understands about relationships and don't deem them as missing column."""
 
-    engine = engine_from_config(ini_settings, 'sqlalchemy.')
+    engine = engine_from_config(ini_settings, "sqlalchemy.")
     conn = engine.connect()
     conn.begin()
 
@@ -165,7 +166,7 @@ def test_sanity_pass_relationship(ini_settings, dbsession):
 def test_sanity_pass_declarative(ini_settings, dbsession):
     """See database sanity check understands about relationships and don't deem them as missing column."""
 
-    engine = engine_from_config(ini_settings, 'sqlalchemy.')
+    engine = engine_from_config(ini_settings, "sqlalchemy.")
     conn = engine.connect()
     conn.begin()
 

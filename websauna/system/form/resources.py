@@ -11,7 +11,9 @@ from websauna.system.form.interfaces import IFormResources
 default_resources = deform.widget.default_resources
 
 # Make sure pick-a-date widget works out of the box
-default_resources["pickadate"][None]["css"] = list(default_resources["pickadate"][None]["css"]) + ["websauna.system:static/pickadate-fixes.css"]
+default_resources["pickadate"][None]["css"] = list(default_resources["pickadate"][None]["css"]) + [
+    "websauna.system:static/pickadate-fixes.css"
+]
 
 
 @implementer(IFormResources)

@@ -27,7 +27,6 @@ class GrandGrandChildResource(GrandChildResource):
 
 
 class ParentView:
-
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -54,7 +53,6 @@ class GrandChildView(GrandChildView):
 
 @view_overrides(context=ChildResource2)
 class ChildViewWithOtherViewConfigs(ParentView):
-
     @view_config(name="show", context=ChildResource2)
     def traversing_test(self):
         return HTTPOk("Showing: {}".format(self.context.id))
@@ -80,7 +78,6 @@ class Root:
 
 
 class ParentRouteView:
-
     def __init__(self, request):
         pass
 

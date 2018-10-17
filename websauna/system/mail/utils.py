@@ -32,6 +32,7 @@ def create_mailer(registry: Registry) -> IMailer:
         # TODO: Make mailer_class explicit so we can dynamically load pyramid_mail.Mailer
         # Default
         from pyramid_mailer import mailer_factory_from_settings
+
         mailer = mailer_factory_from_settings(settings)
     else:
         # debug backend

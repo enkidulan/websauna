@@ -38,7 +38,9 @@ class Resource(_Resource):
 
     def get_path(self):
         """Extract the traverse path name from the database object."""
-        assert hasattr(self, "__parent__"), "get_path() can be called only for objects whose lineage is set by make_lineage()"
+        assert hasattr(
+            self, "__parent__"
+        ), "get_path() can be called only for objects whose lineage is set by make_lineage()"
 
         crud = self.__parent__
         path = crud.mapper.get_path_from_object(self.obj)
@@ -73,6 +75,7 @@ class CRUD(_Resource):
 
         Delete: $base/$id/delete
     """
+
     # How the model is referred in templates. e.g. "User"
     title = "(untitled CRUD)"
 
@@ -109,7 +112,9 @@ class CRUD(_Resource):
         instance = self.make_resource(obj)
 
         path = self.mapper.get_path_from_object(obj)
-        assert type(path) == str, "Object {obj} did not map to URL path correctly, got path {path}".format(obj=obj, path=path)
+        assert type(path) == str, "Object {obj} did not map to URL path correctly, got path {path}".format(
+            obj=obj, path=path
+        )
         instance.make_lineage(self, instance, path)
         return instance
 
@@ -133,9 +138,9 @@ class CRUD(_Resource):
         :param id: Object id.
         :return: Object from database.
         """
-        raise NotImplementedError('Please use concrete subclass like websauna.syste.crud.sqlalchemy')
+        raise NotImplementedError("Please use concrete subclass like websauna.syste.crud.sqlalchemy")
 
-    def get_object_url(self, obj: object, view_name: t.Optional[str]=None) -> str:
+    def get_object_url(self, obj: object, view_name: t.Optional[str] = None) -> str:
         """Get URL for view for an object inside this CRUD.
 
         :param obj: Raw object, e.g. SQLAlchemy instance, which can be wrapped with ``wrap_to_resource``.
@@ -143,7 +148,7 @@ class CRUD(_Resource):
         :return: URL to the object.
         """
         res = self.wrap_to_resource(obj)
-        args = [res, ]
+        args = [res]
         if view_name:
             args.append(view_name)
         return self.request.resource_url(*args)
@@ -154,7 +159,9 @@ class CRUD(_Resource):
         Called by delete view if no alternative logic is implemented.
         :param obj: Raw object, e.g. SQLAlchemy instance.
         """
-        raise NotImplementedError("The subclass must implement actual delete method or give deleter callback in Delete view.")
+        raise NotImplementedError(
+            "The subclass must implement actual delete method or give deleter callback in Delete view."
+        )
 
     def __getitem__(self, path: str) -> Resource:
         """Traverse to a model instance.

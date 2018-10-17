@@ -19,12 +19,12 @@ class FriendlyUUIDWidget(deform.widget.TextInputWidget):
     For :py:class:`websauna.form.field.UUID` Colander type.
     """
 
-    readonly_template = 'readonly/uuid'
+    readonly_template = "readonly/uuid"
 
     def get_template_values(self, field, cstruct, kw):
-        values = {'cstruct': str(cstruct), 'field': field, 'slug': uuid_to_slug(cstruct) if cstruct else ''}
+        values = {"cstruct": str(cstruct), "field": field, "slug": uuid_to_slug(cstruct) if cstruct else ""}
         values.update(kw)
-        values.pop('template', None)
+        values.pop("template", None)
         return values
 
 
@@ -55,7 +55,7 @@ class JSONWidget(deform.widget.TextAreaWidget):
 
     """
 
-    readonly_template = 'readonly/json'
+    readonly_template = "readonly/json"
 
     def __init__(self, cols=80, rows=10, style=JSON_PREFORMATTED_STYLE, prettyprint=True, **kwargs):
         super(JSONWidget, self).__init__(cols=cols, rows=rows, style=style, **kwargs)
@@ -73,8 +73,8 @@ class JSONWidget(deform.widget.TextAreaWidget):
 
     def serialize(self, field, cstruct, **kw):
         if cstruct in (null, None):
-            cstruct = ''
-        readonly = kw.get('readonly', self.readonly)
+            cstruct = ""
+        readonly = kw.get("readonly", self.readonly)
         template = readonly and self.readonly_template or self.template
         values = self.get_template_values(field, cstruct, kw)
 

@@ -15,7 +15,7 @@ class Shell:
         self.request = request
         self.context = context
 
-    @view_config(context=ModelAdmin.Resource, name="shell", route_name="admin", permission='shell')
+    @view_config(context=ModelAdmin.Resource, name="shell", route_name="admin", permission="shell")
     def shell(self):
 
         from websauna.system.notebook.views import launch_context_sensitive_shell

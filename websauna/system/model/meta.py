@@ -25,11 +25,11 @@ from .json import json_serializer
 # providers will autogenerate vastly different names making migrations more
 # difficult. See: http://alembic.readthedocs.org/en/latest/naming.html
 NAMING_CONVENTION = {
-    "ix": 'ix_%(column_0_label)s',
+    "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
     "ck": "ck_%(table_name)s_%(constraint_name)s",
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s"
+    "pk": "pk_%(table_name)s",
 }
 
 metadata = MetaData(naming_convention=NAMING_CONVENTION)
@@ -38,7 +38,7 @@ metadata = MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative_base(metadata=metadata)
 
 
-@event.listens_for(Base, 'class_instrument', propagate=True)
+@event.listens_for(Base, "class_instrument", propagate=True)
 def _on_model_registered(cls):
     """Intercept SQLAlchemy model creation (instrumentation).
 
@@ -50,17 +50,9 @@ def _on_model_registered(cls):
 def includeme(config):
     """Hook up database initialization and SQLAlchemy global setup."""
 
-    config.add_request_method(
-        request_session_factory,
-        'dbsession',
-        reify=True
-    )
+    config.add_request_method(request_session_factory, "dbsession", reify=True)
 
-    config.add_request_method(
-        get_request_tm,
-        'transaction_manager',
-        reify=True
-    )
+    config.add_request_method(get_request_tm, "transaction_manager", reify=True)
 
 
 def request_session_factory(request: Request) -> Session:
@@ -100,25 +92,32 @@ def _get_psql_engine(settings: dict, prefix: str) -> Engine:
     :return: SQLAlchemy Engine
     """
     # http://stackoverflow.com/questions/14783505/encoding-error-with-sqlalchemy-and-postgresql
-    engine = engine_from_config(settings, prefix, connect_args={"options": "-c timezone=utc"}, client_encoding='utf8', isolation_level='SERIALIZABLE', json_serializer=json_serializer)
+    engine = engine_from_config(
+        settings,
+        prefix,
+        connect_args={"options": "-c timezone=utc"},
+        client_encoding="utf8",
+        isolation_level="SERIALIZABLE",
+        json_serializer=json_serializer,
+    )
     return engine
 
 
-def get_engine(settings: dict, prefix: str='sqlalchemy.') -> Engine:
+def get_engine(settings: dict, prefix: str = "sqlalchemy.") -> Engine:
     """Reads config and create a database engine out of it.
 
     :param settings: Application settings
     :param prefix: Configuration prefixes
     :return: SQLAlchemy Engine
     """
-    url = settings.get('sqlalchemy.url')
+    url = settings.get("sqlalchemy.url")
     if not url:
-        raise RuntimeError('sqlalchemy.url missing in the settings')
+        raise RuntimeError("sqlalchemy.url missing in the settings")
 
-    if 'postgres' in url:
+    if "postgres" in url:
         engine = _get_psql_engine(settings, prefix)
     else:
-        raise RuntimeError('Unknown SQLAlchemy connection URL: {url}'.format(url=url))
+        raise RuntimeError("Unknown SQLAlchemy connection URL: {url}".format(url=url))
     return engine
 
 
@@ -131,9 +130,9 @@ def get_default_engine(registry: Registry) -> Engine:
     :return: the created engine
     """
     try:
-        engine = registry['websauna.db.default_engine']
+        engine = registry["websauna.db.default_engine"]
     except KeyError:
-        engine = registry['websauna.db.default_engine'] = get_engine(registry.settings)
+        engine = registry["websauna.db.default_engine"] = get_engine(registry.settings)
 
     return engine
 
@@ -153,7 +152,7 @@ def _create_session(transaction_manager: TransactionManager, engine: Engine) -> 
 _DEFAULT = object()
 
 
-def create_dbsession(registry: Registry, manager: TransactionManager=None, *, isolation_level=_DEFAULT) -> Session:
+def create_dbsession(registry: Registry, manager: TransactionManager = None, *, isolation_level=_DEFAULT) -> Session:
     """Creates a new database using the configured session pooling.
 
     This is called outside request life cycle when initializing and checking the state of the databases.

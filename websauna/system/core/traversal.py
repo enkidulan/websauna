@@ -64,7 +64,11 @@ class Resource:
 
         if not allow_new_parent:
             # Catch bugs when you try to double lineage a persistnet parent -> child relationship
-            assert not getattr(child, "__parent__", None), "Tried to double init lineage for {} -> {}, previous parent was {}".format(parent, child, child.__parent__)
+            assert not getattr(
+                child, "__parent__", None
+            ), "Tried to double init lineage for {} -> {}, previous parent was {}".format(
+                parent, child, child.__parent__
+            )
 
         child.__parent__ = parent
         child.__name__ = name

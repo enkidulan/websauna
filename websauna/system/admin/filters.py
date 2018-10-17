@@ -17,10 +17,12 @@ def admin_breadcrumbs(jinja_ctx, context, **kw):
     if not context:
         return ""
 
-    request = jinja_ctx.get('request') or get_current_request()
+    request = jinja_ctx.get("request") or get_current_request()
     current_view_name = jinja_ctx.get("current_view_name")
     current_view_url = request.url
-    crumbs = get_breadcrumbs(context, request, root_iface=IAdmin, current_view_name=current_view_name, current_view_url=current_view_url)
+    crumbs = get_breadcrumbs(
+        context, request, root_iface=IAdmin, current_view_name=current_view_name, current_view_url=current_view_url
+    )
 
     assert crumbs, "Could not get breadcrumbs for {}".format(context)
 

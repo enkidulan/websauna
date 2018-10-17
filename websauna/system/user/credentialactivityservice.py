@@ -25,7 +25,7 @@ class DefaultCredentialActivityService:
     def __init__(self, request: Request):
         self.request = request
 
-    def create_forgot_password_request(self, email: str, location: str=None) -> Response:
+    def create_forgot_password_request(self, email: str, location: str = None) -> Response:
         """Create a new email activation token for a user and produce the following screen.
 
         * Sets user password reset token
@@ -46,14 +46,19 @@ class DefaultCredentialActivityService:
             raise CannotResetPasswordException("Cannot reset password for email: {email}".format(email=email))
         user, token, expiration_seconds = reset_info
 
-        link = request.route_url('reset_password', code=token)
+        link = request.route_url("reset_password", code=token)
         context = dict(link=link, user=user, expiration_hours=int(expiration_seconds / 3600))
-        send_templated_mail(request, [email, ], "login/email/forgot_password", context=context)
+        send_templated_mail(request, [email], "login/email/forgot_password", context=context)
 
-        messages.add(request, msg="Please check your email to continue password reset.", kind='success', msg_id="msg-check-email")
+        messages.add(
+            request,
+            msg="Please check your email to continue password reset.",
+            kind="success",
+            msg_id="msg-check-email",
+        )
 
         if not location:
-            location = get_config_route(request, 'websauna.request_password_reset_redirect')
+            location = get_config_route(request, "websauna.request_password_reset_redirect")
             assert location
 
         return HTTPFound(location=location)
@@ -69,7 +74,7 @@ class DefaultCredentialActivityService:
         user = user_registry.get_user_by_password_reset_token(activation_code)
         return user
 
-    def reset_password(self, activation_code: str, password: str, location: str=None) -> Response:
+    def reset_password(self, activation_code: str, password: str, location: str = None) -> Response:
         """Perform actual password reset operations.
 
         User has following password reset link (GET) or enters the code on a form.
@@ -88,10 +93,15 @@ class DefaultCredentialActivityService:
 
         user_registry.reset_password(user, password)
 
-        messages.add(request, msg="The password reset complete. Please sign in with your new password.", kind='success', msg_id="msg-password-reset-complete")
+        messages.add(
+            request,
+            msg="The password reset complete. Please sign in with your new password.",
+            kind="success",
+            msg_id="msg-password-reset-complete",
+        )
 
         request.registry.notify(PasswordResetEvent(self.request, user, password))
         request.registry.notify(UserAuthSensitiveOperation(self.request, user, "password_reset"), request)
 
-        location = location or get_config_route(request, 'websauna.reset_password_redirect')
+        location = location or get_config_route(request, "websauna.reset_password_redirect")
         return HTTPFound(location=location)

@@ -70,7 +70,7 @@ def admin_url(jinja_ctx, model_instance, *elements, **kw):
           </a>
         </li>
     """
-    request = jinja_ctx.get('request')
+    request = jinja_ctx.get("request")
     if not request:
         raise RuntimeError("Not rendered with request")
 
@@ -231,7 +231,7 @@ def render_panel(jinja_ctx, context, name, **kwargs):
 
     :return: HTML string of the rendered panel
     """
-    request = jinja_ctx.get('request') or get_current_request()
+    request = jinja_ctx.get("request") or get_current_request()
     return _render_panel(context, request, name="admin_panel", **kwargs)
 
 
@@ -250,9 +250,9 @@ def timestruct(jinja_ctx, context, **kw):
     if not context:
         return ""
 
-    assert type(context) in (datetime.datetime, datetime.time,)
+    assert type(context) in (datetime.datetime, datetime.time)
 
-    request = jinja_ctx.get('request') or get_current_request()
+    request = jinja_ctx.get("request") or get_current_request()
     if not jinja_ctx:
         return ""
 
@@ -288,7 +288,7 @@ def from_timestamp(jinja_ctx, context, **kw):
     return ct
 
 
-def include_filter(config: Configurator, name: str, func: t.Callable, renderers=(".html", ".txt",)):
+def include_filter(config: Configurator, name: str, func: t.Callable, renderers=(".html", ".txt")):
     """Register a new Jinja 2 template filter function.
 
     Example::
@@ -323,7 +323,6 @@ def include_filter(config: Configurator, name: str, func: t.Callable, renderers=
     """
 
     def _include_filter(name, func):
-
         def deferred():
             for renderer_name in renderers:
                 env = config.get_jinja2_environment(name=renderer_name)
@@ -331,7 +330,7 @@ def include_filter(config: Configurator, name: str, func: t.Callable, renderers=
                 env.filters[name] = func
 
         # Because Jinja 2 engine is not initialized here, only included here, we need to do template filter including asynchronously
-        config.action('pyramid_web-include-filter-{}'.format(name), deferred, order=1)
+        config.action("pyramid_web-include-filter-{}".format(name), deferred, order=1)
 
     _include_filter(name, func)
 

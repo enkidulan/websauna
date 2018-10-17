@@ -16,6 +16,7 @@ PASSWORD = "ToholamppiMadCowz585"
 
 def get_user(dbsession):
     from websauna.system.user.models import User
+
     return dbsession.query(User).get(1)
 
 

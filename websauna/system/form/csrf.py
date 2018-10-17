@@ -5,7 +5,7 @@ import deform
 
 @colander.deferred
 def deferred_csrf_value(node, kw):
-    return kw['request'].session.get_csrf_token()
+    return kw["request"].session.get_csrf_token()
 
 
 class CSRFSchema(colander.Schema):
@@ -32,10 +32,9 @@ class CSRFSchema(colander.Schema):
 
     Original code: https://github.com/Pylons/pyramid_deform/blob/master/pyramid_deform/__init__.py
     """
+
     csrf_token = colander.SchemaNode(
-        colander.String(),
-        widget=deform.widget.HiddenWidget(),
-        default=deferred_csrf_value,
+        colander.String(), widget=deform.widget.HiddenWidget(), default=deferred_csrf_value
     )
 
     csrf_token.dictify_by_default = False
@@ -43,6 +42,8 @@ class CSRFSchema(colander.Schema):
 
 def add_csrf(schema: colander.Schema):
     """Add a hidden csrf_token field on the existing Colander schema."""
-    csrf_token = colander.SchemaNode(colander.String(), name="csrf_token", widget=deform.widget.HiddenWidget(), default=deferred_csrf_value)
+    csrf_token = colander.SchemaNode(
+        colander.String(), name="csrf_token", widget=deform.widget.HiddenWidget(), default=deferred_csrf_value
+    )
     csrf_token.dictify_by_default = False
     schema.add(csrf_token)

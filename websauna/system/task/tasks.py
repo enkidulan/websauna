@@ -56,18 +56,19 @@ class WebsaunaTask(Task):
 
         # Make sure tasks don't leave transaction open
         # e.g. in the case of exception
-        if status == 'FAILURE':
-            logger.debug('Closing request task %s, status %s', self, status)
+        if status == "FAILURE":
+            logger.debug("Closing request task %s, status %s", self, status)
             tm = request.transaction_manager
             txn = tm._txn
             if txn:
                 txn.abort()
         else:
-            logger.debug('Finished request task %s, status %s', self, status)
+            logger.debug("Finished request task %s, status %s", self, status)
             # This will terminate dbsession, as set in create_transaction_manager_aware_dbsession
 
         # Call add-on hooks
         from websauna.system.task.events import TaskFinished  # Avoid circular imports
+
         request.registry.notify(TaskFinished(request, self))
         request._process_finished_callbacks()
 
@@ -86,7 +87,7 @@ class ScheduleOnCommitTask(WebsaunaTask):
         # so create a faux request to satisfy the presence of dbsession et. al.
         registry = self.app.registry
 
-        request = _make_request('/', registry)
+        request = _make_request("/", registry)
 
         # Make sure we have a transaction manager
         request.tm = transaction.manager if not tm else tm
@@ -96,7 +97,7 @@ class ScheduleOnCommitTask(WebsaunaTask):
 
     def get_transaction_manager(self, **options) -> TransactionManager:
         """Get the transaction manager we are bound to."""
-        tm = options.get('tm')
+        tm = options.get("tm")
         if not tm:
             raise RuntimeError(
                 'You need to explicitly pass transaction manager as "tm" task option to ScheduleOnCommitTask. Task keyword arguments are are: {options}'.format(
@@ -128,7 +129,7 @@ class ScheduleOnCommitTask(WebsaunaTask):
             underlying = super().__call__
             return underlying(*args, **kwargs)
         except Exception as e:
-            logger.error('Celery task raised an exception %s', e)
+            logger.error("Celery task raised an exception %s", e)
             logger.exception(e)
             raise
 
@@ -142,11 +143,7 @@ class ScheduleOnCommitTask(WebsaunaTask):
         # we're no longer going to be returning an async result from this when
         # called from within a request, response cycle. Ideally we shouldn't be
         # waiting for responses in a request/response cycle anyways though.
-        tm.get().addAfterCommitHook(
-            self._after_commit_hook,
-            args=args,
-            kws=kwargs,
-        )
+        tm.get().addAfterCommitHook(self._after_commit_hook, args=args, kws=kwargs)
 
     def apply_async_instant(self, *args, **options):
         """Schedule async task from a beat process or another task.
@@ -177,10 +174,10 @@ class ScheduleOnCommitTask(WebsaunaTask):
 
     def _after_commit_hook(self, success, *args, **kwargs):
         """When HTTP request terminates and the transaction is committed, actually submit the task to Celery."""
-        logger.debug('Calling after commit hook')
+        logger.debug("Calling after commit hook")
         if success:
             result = self.apply_async_instant(*args, **kwargs)
-            logger.debug('Commit hook resulted to a Celery task %s', result)
+            logger.debug("Commit hook resulted to a Celery task %s", result)
 
 
 class RetryableTransactionTask(ScheduleOnCommitTask):
@@ -223,13 +220,13 @@ class RetryableTransactionTask(ScheduleOnCommitTask):
             @retryable(tm=request.tm)
             def handler(request: Request):
                 # __self__ attribute was removed on Celery 4.2.0 but we keep this check for backwards compatibility
-                if getattr(task, '__self__', None) is not None:
+                if getattr(task, "__self__", None) is not None:
                     return task.run(task.__self__, *args, **kwargs)
                 return task.run(*args, **kwargs)
 
             result = handler(request)
         except Exception as e:
-            logger.error('Celery task raised an exception %s', e)
+            logger.error("Celery task raised an exception %s", e)
             logger.exception(e)
             raise
 
@@ -253,16 +250,15 @@ class TaskProxy:
         self.__name__ = self.original_func.__name__
 
     def __str__(self):
-        return 'TaskProxy for {func} bound to task {task}'.format(
-            func=self.original_func,
-            task=self.celery_task
-        )
+        return "TaskProxy for {func} bound to task {task}".format(func=self.original_func, task=self.celery_task)
 
     def __repr__(self):
         return self.__str__()
 
     def __call__(self, *args, **kwargs):
-        raise RuntimeError('Tasked functions should not be directly called. Instead use apply_async() and other Celery task functions to initiate them.')
+        raise RuntimeError(
+            "Tasked functions should not be directly called. Instead use apply_async() and other Celery task functions to initiate them."
+        )
 
     def bind_celery_task(self, celery_task: Task):
         assert isinstance(celery_task, Task)
@@ -272,9 +268,8 @@ class TaskProxy:
         """Resolve all method calls to the underlying task."""
         if not self.celery_task:
             raise RuntimeError(
-                'Celery task creation failed. Did config.scan() do a sweep on {func}? TaskProxy tried to look up attribute: {attr}'.format(
-                    func=self.original_func,
-                    attr=item
+                "Celery task creation failed. Did config.scan() do a sweep on {func}? TaskProxy tried to look up attribute: {attr}".format(
+                    func=self.original_func, attr=item
                 )
             )
         return getattr(self.celery_task, item)
@@ -302,7 +297,7 @@ def task(*args, **kwargs):
             celery_task = celery.task(task_proxy.original_func, *args, **kwargs)
             proxy.bind_celery_task(celery_task)
 
-        venusian.attach(proxy, register, category='celery')
+        venusian.attach(proxy, register, category="celery")
         return proxy
 
     return _inner

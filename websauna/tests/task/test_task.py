@@ -17,12 +17,12 @@ from websauna.system.user.models import User
 from websauna.tests.task import demotasks
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def task_ini_file():
-    return os.path.join(os.path.dirname(__file__), 'task-test.ini')
+    return os.path.join(os.path.dirname(__file__), "task-test.ini")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def task_app_request(task_ini_file, ini_settings):
     return init_websauna(task_ini_file)
 
@@ -37,7 +37,7 @@ def demo_user(request, dbsession):
         dbsession.add(u)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def celery_worker(request, task_ini_file):
     """py.test fixture to shoot up Celery worker process to process our test tasks when scheduled."""
 

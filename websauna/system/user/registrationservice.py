@@ -54,8 +54,8 @@ class DefaultRegistrationService:
 
         settings = self.request.registry.settings
 
-        require_activation = asbool(settings.get('websauna.require_activation', True))
-        autologin = asbool(settings.get('websauna.autologin', False))
+        require_activation = asbool(settings.get("websauna.require_activation", True))
+        autologin = asbool(settings.get("websauna.autologin", False))
 
         if require_activation:
             self.create_email_activation(user)
@@ -69,7 +69,7 @@ class DefaultRegistrationService:
             login_service = get_login_service(self.request)
             return login_service.authenticate_user(user, login_source="email")
         else:  # not autologin: user must log in just after registering.
-            return render_to_response('login/waiting_for_activation.html', {"user": user}, request=self.request)
+            return render_to_response("login/waiting_for_activation.html", {"user": user}, request=self.request)
 
     def create_email_activation(self, user: IUser):
         """Create through-the-web user sign up with his/her email.
@@ -83,8 +83,8 @@ class DefaultRegistrationService:
         activation_code, expiration_seconds = user_registry.create_email_activation_token(user)
 
         context = {
-            'link': self.request.route_url('activate', code=activation_code),
-            'expiration_hours': int(expiration_seconds / 3600),
+            "link": self.request.route_url("activate", code=activation_code),
+            "expiration_hours": int(expiration_seconds / 3600),
         }
 
         logger.info("Sending sign up email to %s", user.email)
@@ -92,7 +92,7 @@ class DefaultRegistrationService:
         # TODO: Broken abstraction, we assume user.email is a attribute
         send_templated_mail(self.request, [user.email], "login/email/activate", context)
 
-    def activate_by_email(self, activation_code: str, location: str=None) -> Response:
+    def activate_by_email(self, activation_code: str, location: str = None) -> Response:
         """Active a user after user after the activation email.
 
             * User clicks link in the activation email
@@ -107,8 +107,8 @@ class DefaultRegistrationService:
         settings = request.registry.settings
         user_registry = get_user_registry(request)
 
-        after_activate_url = request.route_url(settings.get('websauna.activate_redirect', 'index'))
-        login_after_activation = asbool(settings.get('websauna.login_after_activation', False))
+        after_activate_url = request.route_url(settings.get("websauna.activate_redirect", "index"))
+        login_after_activation = asbool(settings.get("websauna.login_after_activation", False))
 
         user = user_registry.activate_user_by_email_token(activation_code)
         if not user:

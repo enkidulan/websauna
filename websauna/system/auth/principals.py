@@ -42,10 +42,10 @@ def resolve_principals(session_token: str, request: Request) -> t.Optional[t.Lis
         principals = [Authenticated]
 
         # All groups for this user
-        principals += ['group:{}'.format(g.name) for g in user_registry.get_groups(user)]
+        principals += ["group:{}".format(g.name) for g in user_registry.get_groups(user)]
 
         # Give principal for per user permissions
-        principals += ['user:{}'.format(user.id)]
+        principals += ["user:{}".format(user.id)]
 
         # Allow superuser permission
         if user.username in superusers or user.email in superusers:

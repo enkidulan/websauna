@@ -22,9 +22,15 @@ def bad_csrf_token(context: BadCSRFToken, request: Request):
     # Log this as a warning
     session = request.session
     token = session.get_csrf_token()
-    logger.warning("Bad CSRF error: session: %s IP: %s cookie: %s user agent: %s", request.session.session_id, request.client_addr, token, request.user_agent)
+    logger.warning(
+        "Bad CSRF error: session: %s IP: %s cookie: %s user agent: %s",
+        request.session.session_id,
+        request.client_addr,
+        token,
+        request.user_agent,
+    )
 
-    html = render('core/badcsrftoken.html', {}, request=request)
+    html = render("core/badcsrftoken.html", {}, request=request)
     resp = Response(html)
     resp.status_code = 400
 

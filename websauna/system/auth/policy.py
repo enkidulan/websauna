@@ -1,6 +1,5 @@
 # Pyramid
-from pyramid.authentication import \
-    SessionAuthenticationPolicy as _SessionAuthenticationPolicy
+from pyramid.authentication import SessionAuthenticationPolicy as _SessionAuthenticationPolicy
 
 # Websauna
 from websauna.utils.time import now

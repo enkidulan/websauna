@@ -22,7 +22,9 @@ from websauna.system.http import Request
 logger = logging.getLogger(__name__)
 
 
-def create_redis(registry: Registry, connection_url=None, redis_client=StrictRedis, max_connections=16, **redis_options) -> StrictRedis:
+def create_redis(
+    registry: Registry, connection_url=None, redis_client=StrictRedis, max_connections=16, **redis_options
+) -> StrictRedis:
     """Sets up Redis connection pool once at the start of a process.
 
     Connection pool life cycle is the same as Pyramid registry which is the life cycle of a process (all threads).
@@ -31,28 +33,33 @@ def create_redis(registry: Registry, connection_url=None, redis_client=StrictRed
     """
 
     # if no url passed, try to get it from pyramid settings
-    url = registry.settings.get('redis.sessions.url') if connection_url is None else connection_url
+    url = registry.settings.get("redis.sessions.url") if connection_url is None else connection_url
     # otherwise create a new connection
     if url is not None:
         # remove defaults to avoid duplicating settings in the `url`
-        redis_options.pop('password', None)
-        redis_options.pop('host', None)
-        redis_options.pop('port', None)
-        redis_options.pop('db', None)
+        redis_options.pop("password", None)
+        redis_options.pop("host", None)
+        redis_options.pop("port", None)
+        redis_options.pop("db", None)
         # the StrictRedis.from_url option no longer takes a socket
         # argument. instead, sockets should be encoded in the URL if
         # used. example:
         #     unix://[:password]@/path/to/socket.sock?db=0
-        redis_options.pop('unix_socket_path', None)
+        redis_options.pop("unix_socket_path", None)
 
         # connection pools are also no longer a valid option for
         # loading via URL
-        redis_options.pop('connection_pool', None)
+        redis_options.pop("connection_pool", None)
 
         process_name = os.getpid()
         thread_name = threading.current_thread().name
 
-        logger.info("Creating a new Redis connection pool. Process %s, thread %s, max_connections %d", process_name, thread_name, max_connections)
+        logger.info(
+            "Creating a new Redis connection pool. Process %s, thread %s, max_connections %d",
+            process_name,
+            thread_name,
+            max_connections,
+        )
 
         connection_pool = ConnectionPool.from_url(url, max_connections=max_connections, **redis_options)
         redis = StrictRedis(connection_pool=connection_pool)
@@ -79,10 +86,20 @@ def log_redis_statistics(redis: StrictRedis):
     process_name = os.getpid()
     thread_name = threading.current_thread().name
 
-    logger.debug("Redis connection statistics - process: %s, thread: %s, created: %d, max: %d, in-use: %d, available: %d", process_name, thread_name, created, max_connections, available, in_use)
+    logger.debug(
+        "Redis connection statistics - process: %s, thread: %s, created: %d, max: %d, in-use: %d, available: %d",
+        process_name,
+        thread_name,
+        created,
+        max_connections,
+        available,
+        in_use,
+    )
 
 
-def get_redis(request_or_registry: t.Union[Request, Registry], url: str=None, redis_client=StrictRedis, **redis_options) -> StrictRedis:
+def get_redis(
+    request_or_registry: t.Union[Request, Registry], url: str = None, redis_client=StrictRedis, **redis_options
+) -> StrictRedis:
     """Get a connection to Redis.
 
     Example:

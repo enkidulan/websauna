@@ -53,13 +53,15 @@ class FormGenerator:
 
     """
 
-    def __init__(self, schema_customizer: t.Callable=None, schema_binder: t.Callable=None):
+    def __init__(self, schema_customizer: t.Callable = None, schema_binder: t.Callable = None):
         """Initialize Form Generator."""
         self.schema_customizer = schema_customizer
         self.schema_binder = schema_binder
 
     @abstractmethod
-    def generate_form(self, request: Request, context: Resource, mode: EditMode, buttons: t.List[deform.Button], model: type) -> deform.Form:
+    def generate_form(
+        self, request: Request, context: Resource, mode: EditMode, buttons: t.List[deform.Button], model: type
+    ) -> deform.Form:
         """Generate form.
 
         :param request: Current HTTP request
@@ -70,7 +72,15 @@ class FormGenerator:
         :return: Constructed form object
         """
 
-    def create_deform(self, schema: colander.Schema, request: Request, context: Resource, mode: EditMode, buttons: t.List[deform.Button], model: type) -> deform.Form:
+    def create_deform(
+        self,
+        schema: colander.Schema,
+        request: Request,
+        context: Resource,
+        mode: EditMode,
+        buttons: t.List[deform.Button],
+        model: type,
+    ) -> deform.Form:
         """Create a Deform based on a given generated schema.
 
         This method does the following:
@@ -116,13 +126,21 @@ class SQLAlchemyFormGenerator(FormGenerator):
     For example use case see :py:class:`websauna.system.user.adminviews.UserAdd`.
     """
 
-    def __init__(self, includes=None, field_mapper=DefaultSQLAlchemyFieldMapper(), customize_schema: t.Callable=None, schema_binder: t.Callable=None):
+    def __init__(
+        self,
+        includes=None,
+        field_mapper=DefaultSQLAlchemyFieldMapper(),
+        customize_schema: t.Callable = None,
+        schema_binder: t.Callable = None,
+    ):
         """Initialize SQLAlchemyFormGenerator."""
         self.includes = includes
         self.field_mapper = field_mapper
         super(SQLAlchemyFormGenerator, self).__init__(customize_schema, schema_binder)
 
-    def generate_form(self, request: Request, context: Resource, mode: EditMode, buttons: t.List[deform.Button], model: type) -> deform.Form:
+    def generate_form(
+        self, request: Request, context: Resource, mode: EditMode, buttons: t.List[deform.Button], model: type
+    ) -> deform.Form:
         """Generate form.
 
         :param request: Current HTTP request

@@ -14,7 +14,7 @@ from websauna.utils import time
 def new_user(dbsession, new_group):
     """Create a new user and return it for testing."""
     with transaction.manager:
-        u = User(email='example@example.com')
+        u = User(email="example@example.com")
         u.groups.append(new_group)
         dbsession.add(u)
         dbsession.flush()
@@ -25,36 +25,36 @@ def new_user(dbsession, new_group):
 def new_group(dbsession):
     """Create a new groups and return it for testing."""
     with transaction.manager:
-        g = Group(name='Editors')
+        g = Group(name="Editors")
         dbsession.add(g)
     return dbsession.query(Group).get(1)
 
 
 def test_user_creation(new_user):
     """Load the default user models and see we create corresponding tables right."""
-    assert new_user.email == 'example@example.com'
+    assert new_user.email == "example@example.com"
 
 
 def test_generate_username(new_user):
     """Test generate_username method."""
-    assert new_user.generate_username() == 'user-1'
+    assert new_user.generate_username() == "user-1"
 
 
 def test_friendly_name_with_email_fallback(new_user):
     """Test friendly_name property that will return the user email as fallback."""
-    assert new_user.friendly_name == 'example@example.com'
+    assert new_user.friendly_name == "example@example.com"
 
 
 def test_friendly_name_with_full_name(new_user):
     """Test friendly_name property that should return the full_name, if available."""
-    new_user.full_name = 'Jarkko Oikarinen'
-    assert new_user.friendly_name == 'Jarkko Oikarinen'
+    new_user.full_name = "Jarkko Oikarinen"
+    assert new_user.friendly_name == "Jarkko Oikarinen"
 
 
 def test_friendly_name_with_username(new_user):
     """Test friendly_name property that should return the username, if available."""
-    new_user.username = 'francois'
-    assert new_user.friendly_name == 'francois'
+    new_user.username = "francois"
+    assert new_user.friendly_name == "francois"
 
 
 def test_is_activated(new_user):
@@ -92,7 +92,7 @@ def test_cannot_login_if_not_enable(new_user):
 def test_user_is_in_group(dbsession, new_user):
     """Test if user is in a group."""
     new_user = dbsession.query(User).get(1)
-    assert new_user.is_in_group('Editors') is True
+    assert new_user.is_in_group("Editors") is True
 
 
 def test_user_is_admin(dbsession, new_user):
@@ -101,7 +101,7 @@ def test_user_is_admin(dbsession, new_user):
     assert new_user.is_admin() is False
 
     with transaction.manager:
-        g = Group(name='admin')
+        g = Group(name="admin")
         dbsession.add(g)
     g = dbsession.query(Group).get(2)
     new_user.groups.append(g)

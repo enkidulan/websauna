@@ -16,7 +16,9 @@ from websauna.system.model.meta import create_dbsession
 from websauna.system.model.meta import create_transaction_manager_aware_dbsession  # noQA
 
 
-def make_routable_request(dbsession: t.Optional[Session]=None, registry: t.Optional[Registry]=None, path='/') -> IRequest:
+def make_routable_request(
+    dbsession: t.Optional[Session] = None, registry: t.Optional[Registry] = None, path="/"
+) -> IRequest:
     """Creates a dummy request that has route_url and other routing methods.
 
     As this request does not get HTTP hostname and such stuff from WSGI environment, a configuration variable ``websauna.site_url`` is passed as the base URL.
@@ -35,7 +37,7 @@ def make_routable_request(dbsession: t.Optional[Session]=None, registry: t.Optio
     request = Request.blank(path, base_url=base_url)
     request.registry = registry
     request.user = None
-    request.view_name = ''
+    request.view_name = ""
 
     # This will create request.tm, others
     apply_request_extensions(request)

@@ -28,7 +28,7 @@ def resolve(uri):
 
     if parts.scheme == "resource":
         package = parts.netloc
-        args = package.split('.') + [parts.path.lstrip('/')]
+        args = package.split(".") + [parts.path.lstrip("/")]
         path = os.path.join(*args)
 
         req = pkg_resources.Requirement.parse(package)
@@ -89,7 +89,11 @@ def read_ini_secrets(secrets_file, strict=True) -> dict:
                 environment_variable = value[1:]
                 value = os.getenv(environment_variable, None)
                 if not value and strict:
-                    raise MissingSecretsEnvironmentVariable("Secrets key {} needs environment variable {} in file {} section {}".format(key, environment_variable, secrets_file, section))
+                    raise MissingSecretsEnvironmentVariable(
+                        "Secrets key {} needs environment variable {} in file {} section {}".format(
+                            key, environment_variable, secrets_file, section
+                        )
+                    )
 
             secrets["{}.{}".format(section, key)] = value
 

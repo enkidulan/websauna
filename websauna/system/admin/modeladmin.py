@@ -40,7 +40,6 @@ class ModelAdmin(CRUD):
 
     #: Our resource factory
     class Resource(AlchemyResource):
-
         def get_admin(self):
             return self.__parent__.get_admin()
 
@@ -72,7 +71,7 @@ class ModelAdminRoot(Resource):
         """
 
         for model_id, model_cls in self.request.registry.getAdapters([self.request], IModelAdmin):
-            yield(model_id, model_cls)
+            yield (model_id, model_cls)
 
     def __getitem__(self, item):
         """Traverse to model admins. """
@@ -101,7 +100,9 @@ def model_admin(traverse_id: str) -> type:
     :param model_cls: Which model class this admin resource is controlling
     """
 
-    assert all(c in ALLOWED_TRAVERSE_ID_CHARACTERS for c in traverse_id), "traverse_id may only contain lowercase letters, digits and a dash: {}".format(traverse_id)
+    assert all(
+        c in ALLOWED_TRAVERSE_ID_CHARACTERS for c in traverse_id
+    ), "traverse_id may only contain lowercase letters, digits and a dash: {}".format(traverse_id)
 
     def _inner(cls):
         "The class decorator example"
@@ -120,7 +121,7 @@ def model_admin(traverse_id: str) -> type:
             registry.registerAdapter(cls, required=(IRequest,), provided=IModelAdmin, name=traverse_id)
             registry.model_admin_ids_by_model[model] = traverse_id
 
-        venusian.attach(cls, register, category='websauna')
+        venusian.attach(cls, register, category="websauna")
         return cls
 
     return _inner

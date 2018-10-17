@@ -34,7 +34,7 @@ def uuid_to_slug(uuid_: uuid.UUID) -> str:
     # https://docs.python.org/2/library/base64.html#base64.urlsafe_b64encode
 
     # URLs don't like +
-    return encoded.decode("utf-8").rstrip('=\n').replace('/', '_').replace("+", "-")
+    return encoded.decode("utf-8").rstrip("=\n").replace("/", "_").replace("+", "-")
 
 
 def slug_to_uuid(slug: str) -> uuid.UUID:
@@ -58,7 +58,7 @@ def slug_to_uuid(slug: str) -> uuid.UUID:
     assert type(slug) == str
 
     try:
-        bytes = (slug + '==').replace('_', '/').replace("-", "+")
+        bytes = (slug + "==").replace("_", "/").replace("-", "+")
         bytes = base64.b64decode(bytes)
         return uuid.UUID(bytes=bytes)
     except (ValueError, binascii.Error) as e:

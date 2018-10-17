@@ -18,10 +18,9 @@ def throttle_sample(request):
 
 @pytest.fixture(scope="module")
 def throttle_app(request, paster_config):
-    '''Custom WSGI app with permission test views enabled.'''
+    """Custom WSGI app with permission test views enabled."""
 
     class Initializer(websauna.system.Initializer):
-
         def configure_views(self):
             self.config.add_route("throttle_sample", "/")
             self.config.add_view(throttle_sample, route_name="throttle_sample", decorator=throttled_view(limit=1))

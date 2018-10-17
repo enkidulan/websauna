@@ -96,7 +96,10 @@ def _create_child_view_config_from_parent_cb(cb, module_name, liftid, cscope, ov
     # (<function view_config.__call__.<locals>.callback at 0x101d7d268>, 'websauna.system.core.viewconfig.tests.testmodule', 'render None', 'class')
 
     # Check if we are view_config or previously nested @view_overrides
-    if not (cb.__qualname__.startswith("view_config") or cb.__qualname__.startswith("_create_child_view_config_from_parent_cb")):
+    if not (
+        cb.__qualname__.startswith("view_config")
+        or cb.__qualname__.startswith("_create_child_view_config_from_parent_cb")
+    ):
         return (cb, module_name, liftid, cscope), False
 
     # OK we are view_config, then pry the decorators parameters out from the closure. If this is not evil Python programming, I don't know what is.
@@ -127,6 +130,7 @@ class view_overrides(object):
     """A class decorator which overrides chosen view_config arguments from the parent class.
 
     """
+
     def __init__(self, categories=None, **kwargs):
         self.categories = categories
         self.kwargs = kwargs
@@ -135,11 +139,13 @@ class view_overrides(object):
         # Shamefully stolen from venusian.lift
 
         if not isclass(wrapped):
-            raise RuntimeError('"view_overrides" only works as a class decorator; you tried to use it against %r' % wrapped)
+            raise RuntimeError(
+                '"view_overrides" only works as a class decorator; you tried to use it against %r' % wrapped
+            )
 
         frame = sys._getframe(1)
         scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
-        module_name = getattr(module, '__name__', None)
+        module_name = getattr(module, "__name__", None)
         newcategories = Categories(wrapped)
         newcategories.lifted = True
 
@@ -165,12 +171,14 @@ class view_overrides(object):
                         append = True
                         toappend = (cb, module_name, liftid, cscope)
 
-                        if cscope == 'class':
+                        if cscope == "class":
                             for ncb, _, nliftid, nscope in callbacks:
-                                if (nscope == 'class' and liftid == nliftid):
+                                if nscope == "class" and liftid == nliftid:
                                     append = False
                         if append:
-                            toappend, _found = _create_child_view_config_from_parent_cb(*toappend, overrides=self.kwargs)
+                            toappend, _found = _create_child_view_config_from_parent_cb(
+                                *toappend, overrides=self.kwargs
+                            )
                             found = found or _found
                             newcallbacks.append(toappend)
                     newcategory = list(callbacks) + newcallbacks
@@ -181,5 +189,7 @@ class view_overrides(object):
             setattr(wrapped, ATTACH_ATTR, newcategories)
 
         if not found:
-            raise RuntimeError('"view_overrides" could not find any @view_config decorators on the parent classes of %r' % wrapped)
+            raise RuntimeError(
+                '"view_overrides" could not find any @view_config decorators on the parent classes of %r' % wrapped
+            )
         return wrapped

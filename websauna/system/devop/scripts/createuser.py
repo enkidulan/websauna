@@ -28,19 +28,19 @@ def usage_message(argv: t.List[str]):
     """
     cmd = os.path.basename(argv[0])
     msg = (
-        'usage: {cmd} <config_uri> [password] [--admin]\n'
+        "usage: {cmd} <config_uri> [password] [--admin]\n"
         '(example: "{cmd} ws://conf/production.ini mikko@example.com verysecret --admin")'
     ).format(cmd=cmd)
     feedback_and_exit(msg, status_code=1, display_border=False)
 
 
 def create(
-        request,
-        username: str,
-        email: str,
-        password: t.Optional[str]=None,
-        source: str='command_line',
-        admin: bool=False
+    request,
+    username: str,
+    email: str,
+    password: t.Optional[str] = None,
+    source: str = "command_line",
+    admin: bool = False,
 ) -> IUserModel:
     """Create a new site user from command line.
 
@@ -71,13 +71,13 @@ def create(
 
     request.registry.notify(UserCreated(request, u))
     if admin:
-        group = dbsession.query(Group).filter_by(name='admin').one_or_none()
+        group = dbsession.query(Group).filter_by(name="admin").one_or_none()
         group.users.append(u)
 
     return u
 
 
-def main(argv: t.List[str]=sys.argv):
+def main(argv: t.List[str] = sys.argv):
     """Create a new site user from command line.
 
     :param argv: Command line arguments, second one needs to be the uri to a configuration file.
@@ -90,21 +90,19 @@ def main(argv: t.List[str]=sys.argv):
 
     request = init_websauna(config_uri)
     email = argv[2]
-    is_admin = True if '--admin' in argv else False
-    password = argv[3] if len(argv) >= 4 and argv[3] != '--admin' else ''
+    is_admin = True if "--admin" in argv else False
+    password = argv[3] if len(argv) >= 4 and argv[3] != "--admin" else ""
 
     if not password:
-        password = getpass.getpass('Password:')
-        password2 = getpass.getpass('Password (again):')
+        password = getpass.getpass("Password:")
+        password2 = getpass.getpass("Password (again):")
         if password != password2:
-            feedback_and_exit('Passwords did not match', display_border=False)
+            feedback_and_exit("Passwords did not match", display_border=False)
 
     with request.tm:
         u = create(request, email=email, username=email, password=password, admin=is_admin)
-        message = 'Created user #{id}: {email}, admin: {is_admin}'.format(
-            id=u.id,
-            email=u.email,
-            is_admin=u.is_admin()
+        message = "Created user #{id}: {email}, admin: {is_admin}".format(
+            id=u.id, email=u.email, is_admin=u.is_admin()
         )
 
     feedback_and_exit(message, status_code=None, display_border=True)

@@ -27,6 +27,7 @@ def test_UTCDateTime_restricts_timezone_to_utc():
     assert TestUTCModel.date.type.timezone is True
 
     with pytest.raises(ValueError):
+
         class TestUTCModel2(Base):
             """A sample SQLAlchemy model to demostrate db conflicts. """
 

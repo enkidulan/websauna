@@ -25,8 +25,8 @@ def prepare_config_uri(config_uri: str) -> str:
     :param config_uri: Configuration uri, i.e.: websauna/conf/development.ini
     :return: Configuration uri with the prefix ws://.
     """
-    if not config_uri.startswith('ws://'):
-        config_uri = 'ws://{uri}'.format(uri=config_uri)
+    if not config_uri.startswith("ws://"):
+        config_uri = "ws://{uri}".format(uri=config_uri)
     return config_uri
 
 
@@ -48,7 +48,7 @@ def initializer_from_app(app: router.Router) -> Initializer:
     :param app: Websauna WSGI application
     :return: Websauna Initializer
     """
-    initializer = getattr(app, 'initializer', None)
+    initializer = getattr(app, "initializer", None)
     assert initializer is not None, "Configuration did not yield to Websauna application with Initializer set up"
     return initializer
 
@@ -57,11 +57,11 @@ def setup_logging(config_uri, disable_existing_loggers=False):
     """Include-aware Python logging setup from INI config file.
     """
     config_uri = prepare_config_uri(config_uri)
-    loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+    loader = plaster.get_loader(config_uri, protocols=["wsgi"])
     loader.setup_logging(disable_existing_loggers=disable_existing_loggers)
 
 
-def setup_console_logging(log_level: t.Optional[str]=None):
+def setup_console_logging(log_level: t.Optional[str] = None):
     """Setup console logging.
 
     Aimed to give easy sane defaults for logging in command line applications.
@@ -90,7 +90,9 @@ def setup_console_logging(log_level: t.Optional[str]=None):
     logger.setLevel(logging.ERROR)
 
 
-def init_websauna(config_uri: str, sanity_check: bool=False, console_app: bool=False, extra_options: dict=None) -> Request:
+def init_websauna(
+    config_uri: str, sanity_check: bool = False, console_app: bool = False, extra_options: dict = None
+) -> Request:
     """Initialize Websauna WSGI application for a command line oriented script.
 
     Example:
@@ -120,9 +122,7 @@ def init_websauna(config_uri: str, sanity_check: bool=False, console_app: bool=F
     else:
         sanity_check = "false"
 
-    options = {
-        "sanity_check": sanity_check
-    }
+    options = {"sanity_check": sanity_check}
 
     if extra_options:
         options.update(extra_options)

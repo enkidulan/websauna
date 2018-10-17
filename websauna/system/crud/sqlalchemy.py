@@ -24,10 +24,7 @@ class Resource(_Resource):
 
     def get_title(self):
         """Title on show / edit / delete pages."""
-        return "{parent_title} #{id}".format(
-            parent_title=self.__parent__.title,
-            id=self.obj.id
-        )
+        return "{parent_title} #{id}".format(parent_title=self.__parent__.title, id=self.obj.id)
 
 
 class CRUD(_CRUD):
@@ -36,7 +33,7 @@ class CRUD(_CRUD):
     A traversing endpoint which maps listing, add, edit and delete views for an SQLAlchemy model.
     """
 
-    def __init__(self, request: IRequest, model: t.Optional[type]=None):
+    def __init__(self, request: IRequest, model: t.Optional[type] = None):
         """Create a CRUD root resource for a given model.
 
         :param request: Current HTTP Request.
@@ -95,7 +92,11 @@ class CRUD(_CRUD):
         column_name = self.mapper.mapping_attribute
 
         column_instance = getattr(model, column_name, None)
-        assert column_instance, "Model {} does not define column/attribute {} used for CRUD resource traversing".format(self.model, column_name)
+        assert (
+            column_instance
+        ), "Model {} does not define column/attribute {} used for CRUD resource traversing".format(
+            self.model, column_name
+        )
 
         obj = self.get_query().filter(column_instance == id).first()
         if not obj:

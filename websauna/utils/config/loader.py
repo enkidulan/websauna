@@ -18,10 +18,7 @@ class ConfigLoader(loadwsgi.ConfigLoader):
     def __init__(self, filename: str):
         """Initialize the config loader."""
         self.filename = filename = filename.strip()
-        defaults = {
-            'here': os.path.dirname(os.path.abspath(filename)),
-            '__file__': os.path.abspath(filename)
-        }
+        defaults = {"here": os.path.dirname(os.path.abspath(filename)), "__file__": os.path.abspath(filename)}
         self.parser = IncludeAwareConfigParser(filename, defaults=defaults)
         with open(filename) as f:
             self.parser.read_file(f)
@@ -33,10 +30,10 @@ class Loader(plaster_pastedeploy.Loader):
     def __init__(self, uri):
         """Initialize the Loader."""
         # Replace our scheme for file, so it could be handled as usual.
-        uri.scheme = 'file'
+        uri.scheme = "file"
         super().__init__(uri)
 
-    def _get_loader(self, defaults: t.Optional[dict]=None) -> ConfigLoader:
+    def _get_loader(self, defaults: t.Optional[dict] = None) -> ConfigLoader:
         """Return a ConfigLoader instance.
 
         :param defaults: Dict with default values.
@@ -47,7 +44,7 @@ class Loader(plaster_pastedeploy.Loader):
         loader.update_defaults(defaults)
         return loader
 
-    def _get_parser(self, defaults: t.Optional[dict]=None) -> IncludeAwareConfigParser:
+    def _get_parser(self, defaults: t.Optional[dict] = None) -> IncludeAwareConfigParser:
         """Return an instance of IncludeAwareConfigParser.
 
         :param defaults: Dict with default values.
@@ -55,7 +52,7 @@ class Loader(plaster_pastedeploy.Loader):
         """
         return self._get_loader(defaults).parser
 
-    def setup_logging(self, defaults: t.Optional[dict]=None, disable_existing_loggers=False):
+    def setup_logging(self, defaults: t.Optional[dict] = None, disable_existing_loggers=False):
         """Set up logging via :func:`logging.config.fileConfig`.
 
         Defaults are specified for the special ``__file__`` and ``here``
@@ -66,20 +63,17 @@ class Loader(plaster_pastedeploy.Loader):
         :param disable_existing_loggers: Should existing loggers be disabled.
         """
         defaults = defaults if defaults else {}
-        if 'loggers' in self.get_sections():
+        if "loggers" in self.get_sections():
             uri_path = self.uri.path
             parser = self._get_parser()
             defaults.update(
                 {
-                    '__file__': uri_path,
-                    'here': os.path.dirname(uri_path),
-                    'disable_existing_loggers': disable_existing_loggers
+                    "__file__": uri_path,
+                    "here": os.path.dirname(uri_path),
+                    "disable_existing_loggers": disable_existing_loggers,
                 }
             )
-            fileConfig(
-                parser,
-                defaults,
-            )
+            fileConfig(parser, defaults)
         else:
             logging.basicConfig()
 

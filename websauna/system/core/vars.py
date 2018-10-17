@@ -5,6 +5,7 @@ import logging
 
 # Pyramid
 from pyramid.events import BeforeRender
+
 # TODO: We expose this as a global for documentation. Migrate to non-global map in the future.
 from pyramid.path import AssetResolver  # noQA
 from pyramid.path import DottedNameResolver
@@ -240,7 +241,6 @@ def debug(request, registry, settings):
 
 
 def includeme(config):
-
     def on_before_render(event):
         # Augment Pyramid template renderers with these extra variables and deal with JS placement
 

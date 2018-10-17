@@ -17,9 +17,7 @@ from websauna.utils.config import exceptions as exc
 from websauna.utils.config import _resource_manager
 
 
-_VALID_SCHEMAS_ = (
-    'resource',
-)
+_VALID_SCHEMAS_ = ("resource",)
 
 
 class IncludeAwareConfigParser(loadwsgi.NicerConfigParser):
@@ -66,22 +64,18 @@ class IncludeAwareConfigParser(loadwsgi.NicerConfigParser):
         if parts.scheme not in _VALID_SCHEMAS_:
             raise exc.InvalidResourceScheme(
                 "Supported resources: {resources}. Got {include} in {fpname}".format(
-                    resources=', '.join(_VALID_SCHEMAS_),
-                    include=include_file,
-                    fpname=fpname
+                    resources=", ".join(_VALID_SCHEMAS_), include=include_file, fpname=fpname
                 )
             )
 
         package = parts.netloc
-        args = package.split('.') + [parts.path.lstrip('/')]
+        args = package.split(".") + [parts.path.lstrip("/")]
         path = os.path.join(*args)
 
         req = pkg_resources.Requirement.parse(package)
 
         if not _resource_manager.resource_exists(req, path):
-            raise exc.NonExistingInclude(
-                "Could not find {include}".format(include=include_file)
-            )
+            raise exc.NonExistingInclude("Could not find {include}".format(include=include_file))
 
         config_source = _resource_manager.resource_stream(req, path)
         return config_source
@@ -96,7 +90,7 @@ class IncludeAwareConfigParser(loadwsgi.NicerConfigParser):
         config = configparser.ConfigParser()
 
         # For some reason configparser refuses to work with file handles opened by pkg_resource
-        text = fp.read().decode('utf-8')
+        text = fp.read().decode("utf-8")
         config.read_string(text, source=include_file)
 
         for s in config.sections():
@@ -119,13 +113,13 @@ class IncludeAwareConfigParser(loadwsgi.NicerConfigParser):
 
         :param fpname: Main configuration filename.
         """
-        if 'includes' in self.sections():
-            include_ini_files = aslist(self.get('includes', 'include_ini_files'))
+        if "includes" in self.sections():
+            include_ini_files = aslist(self.get("includes", "include_ini_files"))
             for include in include_ini_files:
                 self.read_include(include, fpname)
 
     @classmethod
-    def retrofit_settings(cls, global_config: dict, section: str='app:main') -> dict:
+    def retrofit_settings(cls, global_config: dict, section: str = "app:main") -> dict:
         """Update settings dictionary given to WSGI application constructor by Paster to have included settings.
 
         :param global_config: global_config dict as given by Paster
@@ -133,7 +127,7 @@ class IncludeAwareConfigParser(loadwsgi.NicerConfigParser):
         :return: New instance of settings
         """
         assert global_config
-        assert '__file__' in global_config
+        assert "__file__" in global_config
 
         parser = cls()
         parser.read(global_config["__file__"])

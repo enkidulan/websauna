@@ -35,7 +35,7 @@ class User(usermixin.UserMixin):
     activation_id = sa.Column(sa.Integer, sa.ForeignKey("user_activation.id"))
 
     #: SQLAlchemy relationship for above
-    activation = sa.orm.relationship('Activation', backref='user')
+    activation = sa.orm.relationship("Activation", backref="user")
 
 
 @implementer(IGroup)
@@ -47,11 +47,7 @@ class Group(usermixin.GroupMixin):
     __init__ = _declarative_constructor
 
     users = sa.orm.relationship(
-        'User',
-        secondary="usergroup",
-        passive_deletes=True,
-        passive_updates=True,
-        backref="groups",
+        "User", secondary="usergroup", passive_deletes=True, passive_updates=True, backref="groups"
     )
 
     def __str__(self):

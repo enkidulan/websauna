@@ -41,13 +41,13 @@ def check_python_pyramid_requirements() -> bool:
 
     :return: Boolean indicating if Python and Pyramid requirements are met.
     """
-    error_msg = ''
+    error_msg = ""
     python_version = sys.version_info
-    pyramid_version = tuple(LooseVersion(pkg_resources.get_distribution('pyramid').version).version)
+    pyramid_version = tuple(LooseVersion(pkg_resources.get_distribution("pyramid").version).version)
     if python_version < (3, 5, 2):
-        error_msg = 'Python 3.5.2 or newer is required to run Websauna.'
+        error_msg = "Python 3.5.2 or newer is required to run Websauna."
     elif pyramid_version < (1, 7):
-        error_msg = 'Pyramid version 1.7 or newer required'
+        error_msg = "Pyramid version 1.7 or newer required"
     if error_msg:
         raise RequirementsFailed(error_msg)
     return True
@@ -93,7 +93,7 @@ class Initializer:
         We deliberate push imports inside methods, so that it is unlikely we'd have any import time side effects caused by some less elegant solutions, like gevent.
     """
 
-    def __init__(self, global_config: dict, settings: t.Optional[dict]=None):
+    def __init__(self, global_config: dict, settings: t.Optional[dict] = None):
         """
         :param global_config: Dictionary as passed to WSGI entry point.
 
@@ -105,13 +105,13 @@ class Initializer:
         check_python_pyramid_requirements()
 
         if not settings:
-            config = global_config['__file__']
-            if not config.startswith('ws://'):
-                config = 'ws://{0}'.format(config)
+            config = global_config["__file__"]
+            if not config.startswith("ws://"):
+                config = "ws://{0}".format(config)
 
             loader = plaster.get_loader(config)
             # Read [app] section
-            settings = loader.get_settings('app:main')
+            settings = loader.get_settings("app:main")
 
         #: This is the refer    ence to the config file which started our process. We need to later pass it to Notebook.
         settings["websauna.global_config"] = global_config
@@ -149,6 +149,7 @@ class Initializer:
     def create_static_asset_policy(self):
         """Override to have our own static asset policy."""
         from websauna.system.http.static import DefaultStaticAssetPolicy
+
         return DefaultStaticAssetPolicy(self.config)
 
     def configure_logging(self):
@@ -202,8 +203,9 @@ class Initializer:
 
         if self.config.registry.settings.get("websauna.sample_html_email", False):
             from websauna.system.mail import views
+
             self.config.scan(views)
-            self.config.add_jinja2_search_path('websauna.system.mail:templates', name='.html')
+            self.config.add_jinja2_search_path("websauna.system.mail:templates", name=".html")
 
     @event_source
     def configure_templates(self):
@@ -211,23 +213,23 @@ class Initializer:
         from websauna.system.core.render import get_on_demand_resource_renderer
 
         # Jinja 2 templates as .html files
-        self.config.include('pyramid_jinja2')
-        self.config.add_jinja2_renderer('.html')
-        self.config.add_jinja2_renderer('.txt')
-        self.config.add_jinja2_renderer('.css')
-        self.config.add_jinja2_renderer('.xml')
+        self.config.include("pyramid_jinja2")
+        self.config.add_jinja2_renderer(".html")
+        self.config.add_jinja2_renderer(".txt")
+        self.config.add_jinja2_renderer(".css")
+        self.config.add_jinja2_renderer(".xml")
 
         self.config.include("websauna.system.core.templatecontext")
         self.config.include("websauna.system.core.vars")
 
         # Add core templates to the search path
-        self.config.add_jinja2_search_path('websauna.system.core:templates', name='.html')
-        self.config.add_jinja2_search_path('websauna.system.core:templates', name='.txt')
-        self.config.add_jinja2_search_path('websauna.system.core:templates', name='.xml')
-        self.config.add_jinja2_search_path('websauna.system.core:templates', name='.css')
+        self.config.add_jinja2_search_path("websauna.system.core:templates", name=".html")
+        self.config.add_jinja2_search_path("websauna.system.core:templates", name=".txt")
+        self.config.add_jinja2_search_path("websauna.system.core:templates", name=".xml")
+        self.config.add_jinja2_search_path("websauna.system.core:templates", name=".css")
 
         # Add the default resource registry for Deform
-        self.config.add_request_method(get_on_demand_resource_renderer, 'on_demand_resource_renderer', reify=True)
+        self.config.add_request_method(get_on_demand_resource_renderer, "on_demand_resource_renderer", reify=True)
 
     @event_source
     def configure_authentication(self):
@@ -246,26 +248,31 @@ class Initializer:
         self.config.set_authorization_policy(authz_policy)
 
         # We need to carefully be above TM view, but below exc view so that internal server error page doesn't trigger session authentication that accesses the database
-        self.config.add_tween("websauna.system.auth.tweens.SessionInvalidationTweenFactory", under="pyramid_tm.tm_tween_factory")
+        self.config.add_tween(
+            "websauna.system.auth.tweens.SessionInvalidationTweenFactory", under="pyramid_tm.tm_tween_factory"
+        )
 
         # Grab incoming auth details changed events
         from websauna.system.auth import subscribers
+
         self.config.scan(subscribers)
 
         # Experimental support for transaction aware properties
         try:
             from pyramid_tm.reify import transaction_aware_reify
+
             self.config.add_request_method(
                 callable=transaction_aware_reify(self.config, get_request_user),
                 name="user",
                 property=True,
-                reify=False)
+                reify=False,
+            )
         except ImportError:
-            self.config.add_request_method(get_request_user, 'user', reify=True)
+            self.config.add_request_method(get_request_user, "user", reify=True)
 
     @event_source
     def configure_panels(self):
-        self.config.include('pyramid_layout')
+        self.config.include("pyramid_layout")
 
     @event_source
     def configure_federated_login(self):
@@ -285,7 +292,7 @@ class Initializer:
         settings = self.settings
         secrets = self.secrets
 
-        self.config.add_route('login_social', '/login/{provider_name}')
+        self.config.add_route("login_social", "/login/{provider_name}")
 
         social_logins = aslist(settings.get("websauna.social_logins", ""))
 
@@ -329,7 +336,9 @@ class Initializer:
         instance = authomatic.Authomatic(config=authomatic_config, secret=authomatic_secret, logger=logger)
         self.config.registry.registerUtility(instance, IAuthomatic)
 
-        self.config.registry.registerAdapter(factory=DefaultOAuthLoginService, required=(IRequest,), provided=IOAuthLoginService)
+        self.config.registry.registerAdapter(
+            factory=DefaultOAuthLoginService, required=(IRequest,), provided=IOAuthLoginService
+        )
 
     @event_source
     def configure_database(self):
@@ -351,12 +360,17 @@ class Initializer:
         self.config.include("pyramid_tm")
         self.config.include(".model.meta")
 
-        self.config.registry.registerAdapter(factory=create_transaction_manager_aware_dbsession, required=(IRequest,), provided=ISQLAlchemySessionFactory)
+        self.config.registry.registerAdapter(
+            factory=create_transaction_manager_aware_dbsession,
+            required=(IRequest,),
+            provided=ISQLAlchemySessionFactory,
+        )
 
     @event_source
     def configure_redis(self):
         """Configure Redis connection pool."""
         from websauna.system.core import redis
+
         self.config.registry.redis = redis.create_redis(self.config.registry)
 
         # Add logging events
@@ -372,6 +386,7 @@ class Initializer:
         """
         # Expose Pyramid configuration to classes
         from websauna.system.model.meta import Base
+
         Base.metadata.pyramid_config = self.config
 
     @event_source
@@ -384,10 +399,12 @@ class Initializer:
 
         if not asbool(settings["pyramid.debug_authorization"]):
             from websauna.system.core.views import forbidden
+
             self.config.scan(forbidden)
 
         if not asbool(settings["pyramid.debug_notfound"]):
             from websauna.system.core.views import notfound
+
             self.config.scan(notfound)
 
         # Internal server error page must be only activated in the production mode, as it clashes with pyramid_debugtoolbar, as both handle uncaught exceptions
@@ -396,14 +413,17 @@ class Initializer:
 
         if not debug_toolbar_enabled:
             from websauna.system.core.views import internalservererror
+
             self.config.scan(internalservererror)
 
         if settings.get("websauna.error_test_trigger", False):
             from websauna.system.core.views import errortrigger
+
             self.config.scan(errortrigger)
-            self.config.add_route('error_trigger', '/error-trigger')
+            self.config.add_route("error_trigger", "/error-trigger")
 
         from websauna.system.core.views import badcsrftoken
+
         self.config.scan(badcsrftoken)
 
     @event_source
@@ -413,6 +433,7 @@ class Initializer:
         http://pyramid-tutorials.readthedocs.org/en/latest/getting_started/10-security/
         """
         from websauna.system.core.root import Root
+
         self.config.set_root_factory(Root.root_factory)
 
     @event_source
@@ -432,7 +453,7 @@ class Initializer:
 
         By default we serve only core Websauna assets. Override this to add more static asset declarations to your app.
         """
-        self.static_asset_policy.add_static_view('websauna-static', 'websauna.system:static')
+        self.static_asset_policy.add_static_view("websauna-static", "websauna.system:static")
 
     @event_source
     def configure_sessions(self):
@@ -471,18 +492,18 @@ class Initializer:
         # Set up model lookup
         configure_model_admin(config)
 
-        config.add_jinja2_search_path('websauna.system.admin:templates', name='.html')
-        config.add_jinja2_search_path('websauna.system.admin:templates', name='.txt')
+        config.add_jinja2_search_path("websauna.system.admin:templates", name=".html")
+        config.add_jinja2_search_path("websauna.system.admin:templates", name=".txt")
 
-        config.add_route('admin_home', '/admin/', factory="websauna.system.admin.utils.get_admin")
-        config.add_route('admin', "/admin/*traverse", factory="websauna.system.admin.utils.get_admin")
+        config.add_route("admin_home", "/admin/", factory="websauna.system.admin.utils.get_admin")
+        config.add_route("admin", "/admin/*traverse", factory="websauna.system.admin.utils.get_admin")
 
-        config.add_panel('websauna.system.admin.views.default_model_admin_panel')
+        config.add_panel("websauna.system.admin.views.default_model_admin_panel")
         config.scan(views)
         config.scan(subscribers)
 
         # Add request.admin variable
-        self.config.add_request_method(get_admin, 'admin', reify=True)
+        self.config.add_request_method(get_admin, "admin", reify=True)
 
     def configure_csrf(self):
         """Configure cross-site request forgery subsystem."""
@@ -506,7 +527,7 @@ class Initializer:
         configure_zpt_renderer(["websauna.system.form:templates/deform"])
 
         # Include Deform JS and CSS to static serving
-        self.static_asset_policy.add_static_view('deform-static', 'deform:static')
+        self.static_asset_policy.add_static_view("deform-static", "deform:static")
 
         # Overrides for Deform 2 stock JS and CSS
         default_form_resources = DefaultFormResources()
@@ -516,10 +537,11 @@ class Initializer:
     def configure_crud(self):
         """CRUD templates and views."""
         # Add our template to search path
-        self.config.add_jinja2_search_path('websauna.system.crud:templates', name='.html')
-        self.config.add_jinja2_search_path('websauna.system.crud:templates', name='.txt')
+        self.config.add_jinja2_search_path("websauna.system.crud:templates", name=".html")
+        self.config.add_jinja2_search_path("websauna.system.crud:templates", name=".txt")
 
         from websauna.system.crud import views
+
         self.config.scan(views)
 
     @event_source
@@ -588,22 +610,26 @@ class Initializer:
         # Set up login service
         registry = self.config.registry
         registry.registerAdapter(factory=DefaultLoginService, required=(IRequest,), provided=ILoginService)
-        registry.registerAdapter(factory=DefaultCredentialActivityService, required=(IRequest,), provided=ICredentialActivityService)
-        registry.registerAdapter(factory=DefaultRegistrationService, required=(IRequest,), provided=IRegistrationService)
+        registry.registerAdapter(
+            factory=DefaultCredentialActivityService, required=(IRequest,), provided=ICredentialActivityService
+        )
+        registry.registerAdapter(
+            factory=DefaultRegistrationService, required=(IRequest,), provided=IRegistrationService
+        )
 
-        self.config.add_jinja2_search_path('websauna.system.user:templates', name='.html')
-        self.config.add_jinja2_search_path('websauna.system.user:templates', name='.txt')
+        self.config.add_jinja2_search_path("websauna.system.user:templates", name=".html")
+        self.config.add_jinja2_search_path("websauna.system.user:templates", name=".txt")
 
         self.config.scan(subscribers)
         self.config.scan(views)
-        self.config.add_route('waiting_for_activation', '/waiting-for-activation')
-        self.config.add_route('registration_complete', '/registration-complete')
-        self.config.add_route('login', '/login')
-        self.config.add_route('logout', '/logout')
-        self.config.add_route('forgot_password', '/forgot-password')
-        self.config.add_route('reset_password', '/reset-password/{code}')
-        self.config.add_route('register', '/register')
-        self.config.add_route('activate', '/activate/{code}')
+        self.config.add_route("waiting_for_activation", "/waiting-for-activation")
+        self.config.add_route("registration_complete", "/registration-complete")
+        self.config.add_route("login", "/login")
+        self.config.add_route("logout", "/logout")
+        self.config.add_route("forgot_password", "/forgot-password")
+        self.config.add_route("reset_password", "/reset-password/{code}")
+        self.config.add_route("register", "/register")
+        self.config.add_route("activate", "/activate/{code}")
 
     @event_source
     def configure_password(self):
@@ -627,6 +653,7 @@ class Initializer:
     def configure_model_admins(self):
         import websauna.system.user.admins
         import websauna.system.user.adminviews
+
         self.config.scan(websauna.system.user.admins)
         self.config.scan(websauna.system.user.adminviews)
 
@@ -636,7 +663,7 @@ class Initializer:
 
         # Check if we have IPython installed
         try:
-            pkg_resources.get_distribution('IPython[notebook]')
+            pkg_resources.get_distribution("IPython[notebook]")
         except pkg_resources.DistributionNotFound:
             return
 
@@ -648,9 +675,9 @@ class Initializer:
             # Have installed IPython[Notebook], but not pyramid_notebook
             return
 
-        self.config.add_route('admin_shell', '/notebook/admin-shell')
-        self.config.add_route('shutdown_notebook', '/notebook/shutdown')
-        self.config.add_route('notebook_proxy', '/notebook/*remainder')
+        self.config.add_route("admin_shell", "/notebook/admin-shell")
+        self.config.add_route("shutdown_notebook", "/notebook/shutdown")
+        self.config.add_route("notebook_proxy", "/notebook/*remainder")
         self.config.scan(websauna.system.notebook.views)
         self.config.scan(websauna.system.notebook.adminviews)
         self.config.scan(websauna.system.notebook.subscribers)
@@ -667,6 +694,7 @@ class Initializer:
 
         # Importing the task is enough to add it to Celerybeat working list
         from websauna.system.devop import tasks  # noQA
+
         self.config.scan(tasks)
 
     @event_source
@@ -692,7 +720,7 @@ class Initializer:
 
         _secrets = read_ini_secrets(secrets_file, strict=strict)
         self.config.registry.registerUtility(_secrets, ISecrets)
-        secret_settings = {k.replace('app:main.', ''): v for k, v in _secrets.items() if k.startswith('app:main.')}
+        secret_settings = {k.replace("app:main.", ""): v for k, v in _secrets.items() if k.startswith("app:main.")}
         settings.update(secret_settings)
         self.config.registry.settings.update(secret_settings)
         return _secrets
@@ -713,7 +741,9 @@ class Initializer:
         """
 
         # Avoid running the initializer twice. This might happen e.g. due to a bad testing set up where the initializer creation is not scoped properly. E.g. Jinja template engine will get very confused.
-        assert not self._already_run, "Attempted to run initializer twice. Please avoid double initialization as it will lead to problems."
+        assert (
+            not self._already_run
+        ), "Attempted to run initializer twice. Please avoid double initialization as it will lead to problems."
 
         self.configure_logging()
 
@@ -804,13 +834,19 @@ class Initializer:
             if not sanitycheck.is_sane_database(Base, dbsession):
                 raise SanityCheckFailed("The database sanity check failed. Check log for details.")
         except sqlalchemy.exc.OperationalError as e:
-            raise SanityCheckFailed("The database {} is not responding.\nMake sure the database is running on your local computer or correctly configured in settings INI file.\nFor more information see https://websauna.org/docs/tutorials/gettingstarted/tutorial_02.html.".format(db_connection_string)) from e
+            raise SanityCheckFailed(
+                "The database {} is not responding.\nMake sure the database is running on your local computer or correctly configured in settings INI file.\nFor more information see https://websauna.org/docs/tutorials/gettingstarted/tutorial_02.html.".format(
+                    db_connection_string
+                )
+            ) from e
 
         dbsession.close()
 
         if self._has_redis_sessions:
             if not redis.is_sane_redis(self.config):
-                raise SanityCheckFailed("Could not connect to Redis server.\nWebsauna is configured to use Redis server for session data.\nIt cannot start up without a running Redis server.\nPlease consult your operating system community how to install and start a Redis server.")
+                raise SanityCheckFailed(
+                    "Could not connect to Redis server.\nWebsauna is configured to use Redis server for session data.\nIt cannot start up without a running Redis server.\nPlease consult your operating system community how to install and start a Redis server."
+                )
 
     @event_source
     def wrap_wsgi_app(self, app):
@@ -906,7 +942,8 @@ class DemoInitializer(Initializer):
         # built upon Websauna.
         super(DemoInitializer, self).configure_views()
         from websauna.system.core.views import home
-        self.config.add_route('home', '/')
+
+        self.config.add_route("home", "/")
         self.config.scan(home)
 
 

@@ -32,7 +32,9 @@ EMAIL = "example@example.com"
 PASSWORD = "ToholamppiMadCowz585"
 
 
-def create_user(dbsession: Session, registry: Registry, email: str=EMAIL, password: str=PASSWORD, admin: bool=False) -> User:
+def create_user(
+    dbsession: Session, registry: Registry, email: str = EMAIL, password: str = PASSWORD, admin: bool = False
+) -> User:
     """A helper function to create normal and admin users for tests.
 
     Example:
@@ -80,7 +82,15 @@ def create_user(dbsession: Session, registry: Registry, email: str=EMAIL, passwo
     return user
 
 
-def create_logged_in_user(dbsession: Session, registry: Registry, web_server: str, browser: DriverAPI, admin: bool=False, email: str=EMAIL, password: str=PASSWORD):
+def create_logged_in_user(
+    dbsession: Session,
+    registry: Registry,
+    web_server: str,
+    browser: DriverAPI,
+    admin: bool = False,
+    email: str = EMAIL,
+    password: str = PASSWORD,
+):
     """For a web browser test session, creates a new user and log it in inside the test browser."""
     # Catch some common argument misordering issues
     assert isinstance(registry, Registry)
@@ -119,7 +129,9 @@ def wait_until(callback: t.Callable, expected: object, deadline=1.0, poll_period
             return val
         time.sleep(poll_period)
 
-    raise AssertionError("Callback {} did not return in expected value {} within {} seconds".format(callback, expected, deadline))
+    raise AssertionError(
+        "Callback {} did not return in expected value {} within {} seconds".format(callback, expected, deadline)
+    )
 
 
 def login(web_server: str, browser: DriverAPI, email=EMAIL, password=PASSWORD):

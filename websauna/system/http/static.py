@@ -73,7 +73,7 @@ def md5(filename: str) -> str:
 class CopyAndHashCollector:
     """Toss all static files into perma-asset folder, MD5 hash included in the name."""
 
-    def __init__(self, root: str, settings: dict, target_path: str=None):
+    def __init__(self, root: str, settings: dict, target_path: str = None):
         """Initialize CopyAndHashCollector.
 
         :param root: Root path.
@@ -94,7 +94,7 @@ class CopyAndHashCollector:
         :return: Permanent path to the asset.
         """
         base_file, ext = os.path.splitext(relative_path)
-        ext = '.{hash}{ext}'.format(hash=hash, ext=ext)
+        ext = ".{hash}{ext}".format(hash=hash, ext=ext)
         relative_path = base_file + ext
         return os.path.join(self.root, MARKER_FOLDER, relative_path)
 
@@ -122,7 +122,7 @@ class CopyAndHashCollector:
 
         # Create a permanent copy
         shutil.copy(entry.path, target)
-        logger.info('Writing %s', target)
+        logger.info("Writing %s", target)
         return rel_target
 
     def collect(self, root: str, static_view_name: str, entry: DirEntry, relative_path: str):
@@ -137,17 +137,17 @@ class CopyAndHashCollector:
         by_view = self.collected[static_view_name]
         by_view[relative_path] = target
         self.process(root, static_view_name, entry, relative_path)
-        logger.info('Collected %s:%s as %s', static_view_name, relative_path, target)
+        logger.info("Collected %s:%s as %s", static_view_name, relative_path, target)
 
     def finish(self) -> dict:
         """Finish collection and create manifest.json file.
 
         :return: Collected files.
         """
-        manifest_path = os.path.join(self.root, MARKER_FOLDER, 'manifest.json.tmp')
+        manifest_path = os.path.join(self.root, MARKER_FOLDER, "manifest.json.tmp")
         dirs = os.path.dirname(manifest_path)
         os.makedirs(dirs, exist_ok=True)
-        with open(manifest_path, 'wt') as f:
+        with open(manifest_path, "wt") as f:
             json.dump(self.collected, f)
         # Atomic replacement
         # Dotted files should not be accessible through normal static file serving
@@ -253,14 +253,19 @@ class CollectedStaticCacheBuster:
         :return: Manifest entry for a view.
         """
         target_f = os.path.join(self.root, MARKER_FOLDER, MANIFEST_FILE)
-        assert os.path.exists(target_f), "websauna.collected_static manifest does not exist: {path}. Did you run ws-collect-static command?".format(path=target_f)
+        assert os.path.exists(
+            target_f
+        ), "websauna.collected_static manifest does not exist: {path}. Did you run ws-collect-static command?".format(
+            path=target_f
+        )
         with open(target_f, "rt") as f:
             full_manifest = json.load(f)
 
         # Each view has its own fileset inside cache manifest
-        assert self.static_view_name in full_manifest, "Cache manifest did not contain cache data for view {view}, contained {keys}".format(
-            view=self.static_view_name,
-            keys=full_manifest.keys()
+        assert (
+            self.static_view_name in full_manifest
+        ), "Cache manifest did not contain cache data for view {view}, contained {keys}".format(
+            view=self.static_view_name, keys=full_manifest.keys()
         )
         return full_manifest[self.static_view_name]
 

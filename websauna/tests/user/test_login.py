@@ -19,6 +19,7 @@ from websauna.utils.time import now
 
 def get_user(dbsession):
     from websauna.system.user.models import User
+
     return dbsession.query(User).get(1)
 
 
@@ -242,14 +243,12 @@ def test_customize_login(paster_config):
     """Customizing login form works."""
 
     class CustomLoginForm(deform.Form):
-
         def __init__(self, *args, **kwargs):
             login_button = Button(name="login_email", title="Login by fingerprint", css_class="btn-lg btn-block")
-            kwargs['buttons'] = (login_button,)
+            kwargs["buttons"] = (login_button,)
             super().__init__(*args, **kwargs)
 
     class Initializer(websauna.system.DemoInitializer):
-
         def configure_user_forms(self):
 
             from websauna.system.user import interfaces

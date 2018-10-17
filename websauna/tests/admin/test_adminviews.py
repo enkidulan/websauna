@@ -9,20 +9,10 @@ from websauna.tests.test_utils import create_user
 
 def test_pagination(web_server, browser, dbsession, init):
     with transaction.manager:
-        create_logged_in_user(
-            dbsession,
-            init.config.registry,
-            web_server,
-            browser,
-            admin=True
-        )
+        create_logged_in_user(dbsession, init.config.registry, web_server, browser, admin=True)
 
         for index in range(1, 101):
-            u = create_user(
-                dbsession,
-                init.config.registry,
-                email="example{}@example.com".format(index)
-            )
+            u = create_user(dbsession, init.config.registry, email="example{}@example.com".format(index))
             dbsession.add(u)
 
     # quick check total users

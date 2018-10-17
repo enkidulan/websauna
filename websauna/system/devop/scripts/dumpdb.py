@@ -16,13 +16,13 @@ from websauna.system.devop.scripts import get_config_uri
 from websauna.system.devop.scripts import usage_message
 
 
-DUMP_SCRIPT = os.path.join(os.path.dirname(__file__), 'psql-dump.bash')
+DUMP_SCRIPT = os.path.join(os.path.dirname(__file__), "psql-dump.bash")
 
 
 logger = logging.getLogger(__name__)
 
 
-def main(argv: t.List[str]=sys.argv):
+def main(argv: t.List[str] = sys.argv):
     """Wrapper for pgsql-dump.bash script.
 
     :param argv: Command line arguments, second one needs to be the uri to a configuration file.
@@ -30,9 +30,7 @@ def main(argv: t.List[str]=sys.argv):
     """
     if len(argv) < 2:
         usage_message(
-            argv,
-            additional_params='[ARG1, ARG2]',
-            additional_line='All arguments are passed to pg_dump command'
+            argv, additional_params="[ARG1, ARG2]", additional_line="All arguments are passed to pg_dump command"
         )
 
     config_uri = get_config_uri(argv)
@@ -49,7 +47,7 @@ def main(argv: t.List[str]=sys.argv):
 
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, env=bash_env, universal_newlines=True) as p:
         for line in p.stdout:
-            print(line, end='')
+            print(line, end="")
 
 
 if __name__ == "__main__":

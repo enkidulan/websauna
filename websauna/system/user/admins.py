@@ -10,6 +10,7 @@ from websauna.system.user.models import User
 @model_admin(traverse_id="user")
 class UserAdmin(ModelAdmin):
     """Models/user admin root resource."""
+
     #: Traverse title
     title = "Users"
     singular_name = "user"

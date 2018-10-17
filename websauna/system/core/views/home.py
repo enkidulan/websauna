@@ -3,7 +3,7 @@
 from pyramid.view import view_config
 
 
-@view_config(route_name='home', renderer='core/home.html')
+@view_config(route_name="home", renderer="core/home.html")
 def home(request):
     """The default home view of Websauna.
 

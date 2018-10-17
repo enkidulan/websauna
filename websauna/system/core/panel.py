@@ -11,7 +11,7 @@ from markupsafe import Markup
 
 # Jinja 2 adoption of render_panel
 # TODO: make this configurable in upstream
-def render_panel(context, request, name='', *args, **kw):
+def render_panel(context, request, name="", *args, **kw):
     """Render a panel.
 
     TODO: Clean this up

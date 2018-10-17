@@ -15,6 +15,7 @@ from websauna.system.core.events import InternalServerError
 try:
     from pyramid_tm.reify import can_access_transaction_in_excview
     from pyramid_tm.reify import reset_transaction_aware_properties
+
     HAS_NEW_PYRAMID_TM = True
 except ImportError:
     HAS_NEW_PYRAMID_TM = False
@@ -51,7 +52,7 @@ def internal_server_error(context, request):
     if asbool(request.registry.settings.get("websauna.log_internal_server_error", True)):
         logger.exception(context)
 
-    html = render('core/internalservererror.html', {}, request=request)
+    html = render("core/internalservererror.html", {}, request=request)
     resp = Response(html)
     resp.status_code = 500
 

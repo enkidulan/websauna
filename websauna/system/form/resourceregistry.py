@@ -53,7 +53,7 @@ class ResourceRegistry(_ResourceRegistry):
         See http://docs.pylonsproject.org/projects/deform/en/latest/widget.html#the-high-level-deform-field-get-widget-resources-method
         """
         resources = form.get_widget_resources()
-        js_resources = resources['js']
+        js_resources = resources["js"]
         js_links = [request.static_url(r) for r in js_resources]
         return js_links
 
@@ -65,6 +65,6 @@ class ResourceRegistry(_ResourceRegistry):
         See http://docs.pylonsproject.org/projects/deform/en/latest/widget.html#the-high-level-deform-field-get-widget-resources-method
         """
         resources = form.get_widget_resources()
-        css_resources = resources['css']
+        css_resources = resources["css"]
         css_links = [request.static_url(r) for r in css_resources]
         return css_links

@@ -150,7 +150,9 @@ class DefaultEmailBasedUserRegistry:
         if not self.can_reset_password(user):
             return None
 
-        activation_token_expiry_seconds = int(self.registry.settings.get("websauna.activation_token_expiry_seconds", 24 * 3600))
+        activation_token_expiry_seconds = int(
+            self.registry.settings.get("websauna.activation_token_expiry_seconds", 24 * 3600)
+        )
 
         activation = self.Activation()
         activation.expires_at = now() + timedelta(seconds=activation_token_expiry_seconds)
@@ -169,7 +171,9 @@ class DefaultEmailBasedUserRegistry:
         :return: Tuple (email activation code, expiration in seconds)
         """
         activation = self.Activation()
-        activation_token_expiry_seconds = int(self.registry.settings.get("websauna.activation_token_expiry_seconds", 24 * 3600))
+        activation_token_expiry_seconds = int(
+            self.registry.settings.get("websauna.activation_token_expiry_seconds", 24 * 3600)
+        )
         activation.expires_at = now() + timedelta(seconds=activation_token_expiry_seconds)
 
         self.dbsession.add(activation)
